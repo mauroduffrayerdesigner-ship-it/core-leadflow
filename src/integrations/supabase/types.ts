@@ -21,7 +21,7 @@ export type Database = {
           id: string
           logo_url: string | null
           nome: string
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           criado_em?: string | null
@@ -29,7 +29,7 @@ export type Database = {
           id?: string
           logo_url?: string | null
           nome: string
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           criado_em?: string | null
@@ -37,7 +37,7 @@ export type Database = {
           id?: string
           logo_url?: string | null
           nome?: string
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
