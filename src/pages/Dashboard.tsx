@@ -1,111 +1,121 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
-import { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Building, Users, Share2, BookOpen } from "lucide-react";
+import Layout from "@/components/Layout";
 
 const Dashboard = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-  const { toast } = useToast();
+  const [stats, setStats] = useState({
+    totalLeads: 0,
+    leadsEsteMs: 0,
+    totalClientes: 0,
+  });
 
   useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate("/auth");
-        return;
-      }
-      setUser(user);
-      setLoading(false);
-    };
+    fetchStats();
+  }, []);
 
-    getUser();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (event === 'SIGNED_OUT' || !session) {
-          navigate("/auth");
-        }
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
-
-  const handleLogout = async () => {
+  const fetchStats = async () => {
     try {
-      await supabase.auth.signOut();
-      toast({
-        title: "Logout realizado com sucesso!",
-        description: "Até logo!",
+      // Total de leads
+      const { count: totalLeads } = await supabase
+        .from("leads")
+        .select("*", { count: "exact", head: true });
+
+      // Leads este mês
+      const inicioMes = new Date();
+      inicioMes.setDate(1);
+      inicioMes.setHours(0, 0, 0, 0);
+
+      const { count: leadsEsteMs } = await supabase
+        .from("leads")
+        .select("*", { count: "exact", head: true })
+        .gte("data_criacao", inicioMes.toISOString());
+
+      // Total de clientes
+      const { count: totalClientes } = await supabase
+        .from("clientes")
+        .select("*", { count: "exact", head: true });
+
+      setStats({
+        totalLeads: totalLeads || 0,
+        leadsEsteMs: leadsEsteMs || 0,
+        totalClientes: totalClientes || 0,
       });
     } catch (error: any) {
-      toast({
-        title: "Erro",
-        description: error.message,
-        variant: "destructive",
-      });
+      console.error("Erro ao buscar estatísticas:", error);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Carregando...</div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="text-2xl font-bold">
-            <span className="text-primary">CORE</span>
-            <span className="text-secondary"> Capture</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">
-              {user?.email}
-            </span>
-            <Button variant="outline" onClick={handleLogout}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Sair
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-8">
-        <div className="text-center">
+    <Layout>
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-4">Dashboard CORE Capture</h1>
           <p className="text-muted-foreground">
             Bem-vindo ao seu dashboard de captura de leads!
           </p>
         </div>
         
-        <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
           <div className="bg-card p-6 rounded-lg border">
             <h3 className="text-lg font-semibold mb-2">Total de Leads</h3>
-            <p className="text-3xl font-bold text-secondary">0</p>
+            <p className="text-3xl font-bold text-secondary">{stats.totalLeads}</p>
           </div>
           
           <div className="bg-card p-6 rounded-lg border">
-            <h3 className="text-lg font-semibold mb-2">Taxa de Conversão</h3>
-            <p className="text-3xl font-bold text-accent">0%</p>
+            <h3 className="text-lg font-semibold mb-2">Clientes Ativos</h3>
+            <p className="text-3xl font-bold text-accent">{stats.totalClientes}</p>
           </div>
           
           <div className="bg-card p-6 rounded-lg border">
             <h3 className="text-lg font-semibold mb-2">Leads Este Mês</h3>
-            <p className="text-3xl font-bold text-primary">0</p>
+            <p className="text-3xl font-bold text-primary">{stats.leadsEsteMs}</p>
           </div>
         </div>
-      </main>
-    </div>
+
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <Button 
+            size="lg" 
+            className="h-24 flex-col gap-2"
+            onClick={() => window.location.href = "/clientes"}
+          >
+            <Building className="h-6 w-6" />
+            Gerenciar Clientes
+          </Button>
+          
+          <Button 
+            size="lg" 
+            variant="outline"
+            className="h-24 flex-col gap-2"
+            onClick={() => window.location.href = "/leads"}
+          >
+            <Users className="h-6 w-6" />
+            Ver Leads
+          </Button>
+          
+          <Button 
+            size="lg" 
+            variant="outline"
+            className="h-24 flex-col gap-2"
+            onClick={() => window.location.href = "/captura"}
+          >
+            <Share2 className="h-6 w-6" />
+            Criar Formulário
+          </Button>
+          
+          <Button 
+            size="lg" 
+            variant="outline"
+            className="h-24 flex-col gap-2"
+            onClick={() => window.open("https://docs.lovable.dev", "_blank")}
+          >
+            <BookOpen className="h-6 w-6" />
+            Documentação
+          </Button>
+        </div>
+      </div>
+    </Layout>
   );
 };
 
