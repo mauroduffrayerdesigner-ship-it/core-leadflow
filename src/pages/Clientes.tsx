@@ -14,6 +14,9 @@ interface Cliente {
   nome: string;
   email: string;
   logo_url?: string;
+  webhook_url?: string;
+  dominio_personalizado?: string;
+  tema_id?: number;
   criado_em: string;
 }
 
@@ -22,10 +25,14 @@ const Clientes = () => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCliente, setEditingCliente] = useState<Cliente | null>(null);
+  const [showTemasModal, setShowTemasModal] = useState(false);
+  const [clienteSelecionado, setClienteSelecionado] = useState<Cliente | null>(null);
   const [formData, setFormData] = useState({
     nome: "",
     email: "",
     logo_url: "",
+    webhook_url: "",
+    dominio_personalizado: "",
   });
   const { toast } = useToast();
 
@@ -64,9 +71,11 @@ const Clientes = () => {
         const { error } = await supabase
           .from("clientes")
           .update({
-            nome: formData.nome,
-            email: formData.email,
-            logo_url: formData.logo_url || null,
+        nome: formData.nome,
+        email: formData.email,
+        logo_url: formData.logo_url || null,
+        webhook_url: formData.webhook_url || null,
+        dominio_personalizado: formData.dominio_personalizado || null,
           })
           .eq("id", editingCliente.id);
 
@@ -80,9 +89,11 @@ const Clientes = () => {
         const { error } = await supabase
           .from("clientes")
           .insert({
-            nome: formData.nome,
-            email: formData.email,
-            logo_url: formData.logo_url || null,
+          nome: formData.nome,
+          email: formData.email,
+          logo_url: formData.logo_url || null,
+          webhook_url: formData.webhook_url || null,
+          dominio_personalizado: formData.dominio_personalizado || null,
             user_id: user.id,
           });
 
@@ -94,7 +105,13 @@ const Clientes = () => {
         });
       }
 
-      setFormData({ nome: "", email: "", logo_url: "" });
+      setFormData({ 
+        nome: "", 
+        email: "", 
+        logo_url: "", 
+        webhook_url: "", 
+        dominio_personalizado: "" 
+      });
       setEditingCliente(null);
       setIsModalOpen(false);
       fetchClientes();
@@ -113,6 +130,8 @@ const Clientes = () => {
       nome: cliente.nome,
       email: cliente.email,
       logo_url: cliente.logo_url || "",
+      webhook_url: cliente.webhook_url || "",
+      dominio_personalizado: cliente.dominio_personalizado || "",
     });
     setIsModalOpen(true);
   };
@@ -166,7 +185,13 @@ const Clientes = () => {
           <DialogTrigger asChild>
             <Button onClick={() => {
               setEditingCliente(null);
-              setFormData({ nome: "", email: "", logo_url: "" });
+              setFormData({ 
+                nome: "", 
+                email: "", 
+                logo_url: "", 
+                webhook_url: "", 
+                dominio_personalizado: "" 
+              });
             }}>
               <Plus className="h-4 w-4 mr-2" />
               Novo Cliente
@@ -217,6 +242,27 @@ const Clientes = () => {
                   value={formData.logo_url}
                   onChange={(e) => setFormData(prev => ({ ...prev, logo_url: e.target.value }))}
                   placeholder="https://exemplo.com/logo.png"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="webhook_url">URL do Webhook N8N (opcional)</Label>
+                <Input
+                  id="webhook_url"
+                  type="url"
+                  value={formData.webhook_url}
+                  onChange={(e) => setFormData(prev => ({ ...prev, webhook_url: e.target.value }))}
+                  placeholder="https://n8n.exemplo.com/webhook/leads"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="dominio_personalizado">Domínio Personalizado (opcional)</Label>
+                <Input
+                  id="dominio_personalizado"
+                  value={formData.dominio_personalizado}
+                  onChange={(e) => setFormData(prev => ({ ...prev, dominio_personalizado: e.target.value }))}
+                  placeholder="meudominio.com"
                 />
               </div>
               
@@ -294,10 +340,18 @@ const Clientes = () => {
                 </div>
               </CardHeader>
               
-              <CardContent>
+              <CardContent className="space-y-3">
                 <div className="text-sm text-muted-foreground">
                   Criado em {new Date(cliente.criado_em).toLocaleDateString('pt-BR')}
                 </div>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full"
+                  onClick={() => window.location.href = `/cliente/${cliente.id}`}
+                >
+                  Gerenciar Landing Page
+                </Button>
               </CardContent>
             </Card>
           ))}
