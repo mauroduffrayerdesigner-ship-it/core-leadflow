@@ -5,6 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, Check } from "lucide-react";
+import PreviewModal from "./PreviewModal";
+import previewModerno from "@/assets/preview-moderno-minimalista.jpg";
+import previewTech from "@/assets/preview-tech-startup.jpg";
+import previewCorporativo from "@/assets/preview-corporativo-elegante.jpg";
+import previewCriativo from "@/assets/preview-criativo-colorido.jpg";
+import previewEcommerce from "@/assets/preview-ecommerce-focus.jpg";
+import previewConsultoria from "@/assets/preview-consultoria-premium.jpg";
 
 interface Tema {
   id: number;
@@ -23,6 +30,8 @@ interface TemasLandingProps {
 const TemasLanding = ({ clienteId, temaSelecionado, onTemaSelect }: TemasLandingProps) => {
   const [temas, setTemas] = useState<Tema[]>([]);
   const [loading, setLoading] = useState(true);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewTemaId, setPreviewTemaId] = useState<number>(1);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -127,9 +136,12 @@ const TemasLanding = ({ clienteId, temaSelecionado, onTemaSelect }: TemasLanding
             </CardHeader>
             
             <CardContent className="space-y-4">
-              {/* Preview placeholder - em uma implementação real, seria uma imagem real */}
-              <div className="h-32 bg-gradient-to-br from-muted to-muted-foreground/20 rounded-lg flex items-center justify-center">
-                <span className="text-muted-foreground text-sm">Preview do Tema</span>
+              <div className="h-32 bg-muted rounded-lg overflow-hidden">
+                <img 
+                  src={tema.id === 1 ? previewModerno : tema.id === 2 ? previewTech : tema.id === 3 ? previewCorporativo : tema.id === 4 ? previewCriativo : tema.id === 5 ? previewEcommerce : previewConsultoria} 
+                  alt={`Preview ${tema.nome}`}
+                  className="w-full h-full object-cover"
+                />
               </div>
               
               <div className="flex gap-2">
@@ -138,11 +150,8 @@ const TemasLanding = ({ clienteId, temaSelecionado, onTemaSelect }: TemasLanding
                   size="sm"
                   className="flex-1"
                   onClick={() => {
-                    // Preview do tema - abrir em modal ou nova aba
-                    toast({
-                      title: "Preview",
-                      description: "Funcionalidade de preview em desenvolvimento",
-                    });
+                    setPreviewTemaId(tema.id);
+                    setPreviewOpen(true);
                   }}
                 >
                   <Eye className="h-4 w-4 mr-2" />
@@ -163,6 +172,13 @@ const TemasLanding = ({ clienteId, temaSelecionado, onTemaSelect }: TemasLanding
           </Card>
         ))}
       </div>
+
+      <PreviewModal 
+        isOpen={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        temaId={previewTemaId}
+        clienteId={clienteId}
+      />
     </div>
   );
 };
