@@ -13,6 +13,9 @@ interface Cliente {
   logo_url?: string;
   tema_id: number;
   webhook_url?: string;
+  headline?: string;
+  subtitulo?: string;
+  texto_cta?: string;
 }
 
 interface LandingPageProps {
@@ -105,10 +108,10 @@ const LandingPageRenderer = ({ cliente, isPreview = false }: LandingPageProps) =
                   <img src={cliente.logo_url} alt={cliente.nome} className="h-16 mx-auto mb-8" />
                 )}
                 <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                  Simplicidade que Converte
+                  {cliente.headline || "Simplicidade que Converte"}
                 </h1>
                 <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed">
-                  Design clean e moderno focado em resultados. Menos é mais quando se trata de conversão.
+                  {cliente.subtitulo || "Design clean e moderno focado em resultados. Menos é mais quando se trata de conversão."}
                 </p>
                 
                 <Card className="max-w-md mx-auto shadow-2xl border-0">
@@ -143,7 +146,7 @@ const LandingPageRenderer = ({ cliente, isPreview = false }: LandingPageProps) =
                         rows={3}
                       />
                       <Button type="submit" className="w-full h-12 text-lg bg-gray-900 hover:bg-gray-800" disabled={loading}>
-                        {loading ? "Enviando..." : "Quero saber mais!"}
+                        {loading ? "Enviando..." : (cliente.texto_cta || "Quero saber mais!")}
                       </Button>
                     </form>
                   </CardContent>

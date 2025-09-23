@@ -20,10 +20,13 @@ export type Database = {
           criado_em: string | null
           dominio_personalizado: string | null
           email: string
+          headline: string | null
           id: string
           logo_url: string | null
           nome: string
+          subtitulo: string | null
           tema_id: number | null
+          texto_cta: string | null
           user_id: string
           webhook_url: string | null
         }
@@ -32,10 +35,13 @@ export type Database = {
           criado_em?: string | null
           dominio_personalizado?: string | null
           email: string
+          headline?: string | null
           id?: string
           logo_url?: string | null
           nome: string
+          subtitulo?: string | null
           tema_id?: number | null
+          texto_cta?: string | null
           user_id: string
           webhook_url?: string | null
         }
@@ -44,10 +50,13 @@ export type Database = {
           criado_em?: string | null
           dominio_personalizado?: string | null
           email?: string
+          headline?: string | null
           id?: string
           logo_url?: string | null
           nome?: string
+          subtitulo?: string | null
           tema_id?: number | null
+          texto_cta?: string | null
           user_id?: string
           webhook_url?: string | null
         }

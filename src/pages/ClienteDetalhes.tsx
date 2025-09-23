@@ -13,12 +13,17 @@ import {
   Settings, 
   ExternalLink,
   Copy,
-  Palette 
+  Palette,
+  Edit,
+  Users,
+  TrendingUp,
+  Webhook
 } from "lucide-react";
 import Layout from "@/components/Layout";
 import TemasLanding from "@/components/landing/TemasLanding";
 import MetricasAvancadas from "@/components/dashboard/MetricasAvancadas";
 import ConfigurarWebhook from "@/components/webhooks/ConfigurarWebhook";
+import EditarLandingPage from "@/components/landing/EditarLandingPage";
 import ImportarCSV from "@/components/leads/ImportarCSV";
 
 interface Cliente {
@@ -217,10 +222,14 @@ const ClienteDetalhes = () => {
 
           {/* Tabs de Funcionalidades */}
           <Tabs defaultValue="metricas" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="metricas" className="gap-2">
                 <BarChart3 className="h-4 w-4" />
                 Métricas
+              </TabsTrigger>
+              <TabsTrigger value="landing" className="gap-2">
+                <Edit className="h-4 w-4" />
+                Landing Page
               </TabsTrigger>
               <TabsTrigger value="temas" className="gap-2">
                 <Palette className="h-4 w-4" />
@@ -242,6 +251,10 @@ const ClienteDetalhes = () => {
 
             <TabsContent value="metricas">
               <MetricasAvancadas clienteId={clienteId} />
+            </TabsContent>
+
+            <TabsContent value="landing">
+              <EditarLandingPage clienteId={clienteId!} />
             </TabsContent>
 
             <TabsContent value="temas">
