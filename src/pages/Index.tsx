@@ -15,8 +15,11 @@ const Index = () => {
           <Badge variant="secondary" className="mb-4 text-sm font-medium">
             🚀 Plataforma SaaS Completa
           </Badge>
+          <div className="flex justify-center mb-8">
+            <img src="/favicon.svg" alt="CORE" className="h-20 w-20" />
+          </div>
           <div className="text-6xl font-bold mb-6 bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
-            CORE Capture
+            CORE LeadFlow
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-6 text-foreground leading-tight">
             Capture leads com
