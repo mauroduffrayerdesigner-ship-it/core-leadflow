@@ -28,12 +28,14 @@ const LandingPage = () => {
 
   const fetchCliente = async () => {
     try {
+      console.log("Buscando cliente com ID:", clienteId);
       const { data, error } = await supabase
         .from("clientes")
         .select("id, nome, email, logo_url, tema_id, webhook_url, dominio_personalizado")
         .eq("id", clienteId)
         .single();
 
+      console.log("Resultado da consulta:", { data, error });
       if (error) throw error;
       
       if (!data) {
