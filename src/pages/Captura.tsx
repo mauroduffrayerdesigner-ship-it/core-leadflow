@@ -326,6 +326,7 @@ const Captura = () => {
           </Card>
         </div>
       </div>
+      </div>
     </Layout>
   );
 };
