@@ -16,57 +16,81 @@ export type Database = {
     Tables: {
       clientes: {
         Row: {
+          configuracoes: Json | null
           criado_em: string | null
+          dominio_personalizado: string | null
           email: string
           id: string
           logo_url: string | null
           nome: string
+          tema_id: number | null
           user_id: string
+          webhook_url: string | null
         }
         Insert: {
+          configuracoes?: Json | null
           criado_em?: string | null
+          dominio_personalizado?: string | null
           email: string
           id?: string
           logo_url?: string | null
           nome: string
+          tema_id?: number | null
           user_id: string
+          webhook_url?: string | null
         }
         Update: {
+          configuracoes?: Json | null
           criado_em?: string | null
+          dominio_personalizado?: string | null
           email?: string
           id?: string
           logo_url?: string | null
           nome?: string
+          tema_id?: number | null
           user_id?: string
+          webhook_url?: string | null
         }
         Relationships: []
       }
       leads: {
         Row: {
           cliente_id: string | null
+          data_atualizacao: string | null
           data_criacao: string | null
           email: string
           id: string
           interesse: string | null
           nome: string
+          notas: string | null
+          origem: string | null
+          status: string | null
           telefone: string | null
         }
         Insert: {
           cliente_id?: string | null
+          data_atualizacao?: string | null
           data_criacao?: string | null
           email: string
           id?: string
           interesse?: string | null
           nome: string
+          notas?: string | null
+          origem?: string | null
+          status?: string | null
           telefone?: string | null
         }
         Update: {
           cliente_id?: string | null
+          data_atualizacao?: string | null
           data_criacao?: string | null
           email?: string
           id?: string
           interesse?: string | null
           nome?: string
+          notas?: string | null
+          origem?: string | null
+          status?: string | null
           telefone?: string | null
         }
         Relationships: [
@@ -78,6 +102,80 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      metricas_cliente: {
+        Row: {
+          cliente_id: string | null
+          criado_em: string | null
+          data_metrica: string | null
+          id: string
+          leads_convertidos: number | null
+          leads_csv: number | null
+          leads_formulario: number | null
+          leads_manual: number | null
+          leads_n8n: number | null
+          leads_qualificados: number | null
+          total_leads: number | null
+        }
+        Insert: {
+          cliente_id?: string | null
+          criado_em?: string | null
+          data_metrica?: string | null
+          id?: string
+          leads_convertidos?: number | null
+          leads_csv?: number | null
+          leads_formulario?: number | null
+          leads_manual?: number | null
+          leads_n8n?: number | null
+          leads_qualificados?: number | null
+          total_leads?: number | null
+        }
+        Update: {
+          cliente_id?: string | null
+          criado_em?: string | null
+          data_metrica?: string | null
+          id?: string
+          leads_convertidos?: number | null
+          leads_csv?: number | null
+          leads_formulario?: number | null
+          leads_manual?: number | null
+          leads_n8n?: number | null
+          leads_qualificados?: number | null
+          total_leads?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "metricas_cliente_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      temas_landing: {
+        Row: {
+          criado_em: string | null
+          descricao: string | null
+          id: number
+          nome: string
+          preview_url: string | null
+        }
+        Insert: {
+          criado_em?: string | null
+          descricao?: string | null
+          id?: number
+          nome: string
+          preview_url?: string | null
+        }
+        Update: {
+          criado_em?: string | null
+          descricao?: string | null
+          id?: number
+          nome?: string
+          preview_url?: string | null
+        }
+        Relationships: []
       }
     }
     Views: {
