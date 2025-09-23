@@ -6,6 +6,9 @@ import { Building, Users, Share2, BookOpen, BarChart3, TrendingUp, Globe } from 
 import { Badge } from "@/components/ui/badge";
 import Layout from "@/components/Layout";
 import MetricasAvancadas from "@/components/dashboard/MetricasAvancadas";
+import { StatCard } from "@/components/dashboard/StatCard";
+import { QuickActions } from "@/components/dashboard/QuickActions";
+import { RecentActivity } from "@/components/dashboard/RecentActivity";
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -74,76 +77,89 @@ const Dashboard = () => {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-4">Dashboard CORE Capture</h1>
-          <p className="text-muted-foreground">
+      <div className="container mx-auto px-4 py-8 space-y-8">
+        <div className="text-center mb-12">
+          <div className="inline-block">
+            <h1 className="text-5xl font-bold mb-4 gradient-bg-hero bg-clip-text text-transparent">
+              Dashboard CORE Capture
+            </h1>
+          </div>
+          <p className="text-xl text-muted-foreground mb-4">
             Plataforma SaaS completa para captura de leads com landing pages otimizadas
           </p>
-          <Badge variant="secondary" className="mt-2">
-            Sistema SaaS Ativo
+          <Badge variant="secondary" className="text-sm px-4 py-2 animate-pulse-slow">
+            🚀 Sistema SaaS Ativo
           </Badge>
         </div>
         
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5 mb-8">
-          <div className="bg-card p-6 rounded-lg border">
-            <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-              <Users className="h-5 w-5 text-primary" />
-              Total de Leads
-            </h3>
-            <p className="text-3xl font-bold text-primary">{stats.totalLeads}</p>
-          </div>
-          
-          <div className="bg-card p-6 rounded-lg border">
-            <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-              <Building className="h-5 w-5 text-secondary" />
-              Clientes Ativos
-            </h3>
-            <p className="text-3xl font-bold text-secondary">{stats.totalClientes}</p>
-          </div>
-          
-          <div className="bg-card p-6 rounded-lg border">
-            <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-accent" />
-              Leads Este Mês
-            </h3>
-            <p className="text-3xl font-bold text-accent">{stats.leadsEsteMs}</p>
-          </div>
+        {/* Cards de Métricas com Design Aprimorado */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
+          <StatCard
+            title="Total de Leads"
+            value={stats.totalLeads}
+            description="Todos os leads capturados"
+            icon={<Users className="h-4 w-4" />}
+            trend={{ value: 12, label: "vs mês anterior" }}
+            className="shadow-brand-primary"
+          />
 
-          <div className="bg-card p-6 rounded-lg border">
-            <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-              <Globe className="h-5 w-5 text-muted-foreground" />
-              Landing Pages
-            </h3>
-            <p className="text-3xl font-bold text-muted-foreground">{stats.landingPagesAtivas}</p>
-          </div>
+          <StatCard
+            title="Clientes Ativos"
+            value={stats.totalClientes}
+            description="Clientes cadastrados"
+            icon={<Building className="h-4 w-4" />}
+            trend={{ value: 25, label: "crescimento" }}
+            className="shadow-brand-secondary"
+          />
 
-          <div className="bg-card p-6 rounded-lg border">
-            <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-green-600" />
-              Conversão Média
-            </h3>
-            <p className="text-3xl font-bold text-green-600">{stats.taxaConversaoMedia.toFixed(1)}%</p>
-          </div>
+          <StatCard
+            title="Leads Este Mês"
+            value={stats.leadsEsteMs}
+            description={`Novos leads em ${new Date().toLocaleDateString('pt-BR', { month: 'long' })}`}
+            icon={<TrendingUp className="h-4 w-4" />}
+            trend={{ value: 8, label: "vs mês anterior" }}
+            className="shadow-brand-accent"
+          />
+
+          <StatCard
+            title="Landing Pages"
+            value={stats.landingPagesAtivas}
+            description="Páginas ativas"
+            icon={<Globe className="h-4 w-4" />}
+            trend={{ value: 5, label: "novas este mês" }}
+          />
+
+          <StatCard
+            title="Conversão Média"
+            value={`${stats.taxaConversaoMedia.toFixed(1)}%`}
+            description="Taxa de sucesso"
+            icon={<BarChart3 className="h-4 w-4" />}
+            trend={{ value: 3, label: "melhoria" }}
+            className="shadow-glow"
+          />
+        </div>
+
+        {/* Grid de Ações e Atividades */}
+        <div className="grid gap-6 md:grid-cols-3">
+          <QuickActions />
+          <RecentActivity />
         </div>
 
         {/* Métricas Avançadas */}
-        <div className="mb-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5" />
-                Analytics Avançados
-              </CardTitle>
-              <CardDescription>
-                Visão completa das métricas de todos os clientes
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <MetricasAvancadas />
-            </CardContent>
-          </Card>
-        </div>
+        <Card className="glass-effect shadow-brand-secondary">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-2xl">
+              <BarChart3 className="h-6 w-6 text-secondary" />
+              Analytics Avançados
+            </CardTitle>
+            <CardDescription className="text-base">
+              Visão completa das métricas de todos os clientes em tempo real
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <MetricasAvancadas />
+          </CardContent>
+        </Card>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <Button 

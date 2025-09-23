@@ -11,9 +11,27 @@ All colors MUST be HSL.
     /* CORE Capture Brand Colors */
     --core-black: 0 0% 0%;
     --core-green: 158 100% 43%;
+    --core-green-light: 158 100% 50%;
     --core-yellow: 62 100% 65%;
+    --core-yellow-light: 62 100% 70%;
     --core-purple: 280 61% 82%;
     --core-white: 0 0% 100%;
+    
+    /* Enhanced Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--core-black)), hsl(var(--core-green)));
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--core-green)), hsl(var(--core-yellow)));
+    --gradient-accent: linear-gradient(135deg, hsl(var(--core-yellow)), hsl(var(--core-purple)));
+    --gradient-hero: linear-gradient(135deg, hsl(var(--core-black)) 0%, hsl(var(--core-green)) 50%, hsl(var(--core-yellow)) 100%);
+    
+    /* Shadows with brand colors */
+    --shadow-primary: 0 10px 30px -10px hsl(var(--core-black) / 0.3);
+    --shadow-secondary: 0 10px 30px -10px hsl(var(--core-green) / 0.3);
+    --shadow-accent: 0 10px 30px -10px hsl(var(--core-yellow) / 0.3);
+    --shadow-glow: 0 0 40px hsl(var(--core-green) / 0.4);
+    
+    /* Animation variables */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
     --background: var(--core-white);
     --foreground: var(--core-black);
@@ -109,4 +127,91 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@layer utilities {
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent;
+  }
+  
+  .gradient-bg-primary {
+    background: var(--gradient-primary);
+  }
+  
+  .gradient-bg-secondary {
+    background: var(--gradient-secondary);
+  }
+  
+  .gradient-bg-accent {
+    background: var(--gradient-accent);
+  }
+  
+  .gradient-bg-hero {
+    background: var(--gradient-hero);
+  }
+  
+  .shadow-brand-primary {
+    box-shadow: var(--shadow-primary);
+  }
+  
+  .shadow-brand-secondary {
+    box-shadow: var(--shadow-secondary);
+  }
+  
+  .shadow-brand-accent {
+    box-shadow: var(--shadow-accent);
+  }
+  
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+  
+  .transition-bounce {
+    transition: var(--transition-bounce);
+  }
+  
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .animate-pulse-slow {
+    animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  .glass-effect {
+    @apply bg-background/80 backdrop-blur-md border border-border/50;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    hsl(var(--secondary) / 0.2),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
 }
