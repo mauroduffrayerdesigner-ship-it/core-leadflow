@@ -14,7 +14,71 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      clientes: {
+        Row: {
+          criado_em: string | null
+          email: string
+          id: string
+          logo_url: string | null
+          nome: string
+          user_id: string | null
+        }
+        Insert: {
+          criado_em?: string | null
+          email: string
+          id?: string
+          logo_url?: string | null
+          nome: string
+          user_id?: string | null
+        }
+        Update: {
+          criado_em?: string | null
+          email?: string
+          id?: string
+          logo_url?: string | null
+          nome?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      leads: {
+        Row: {
+          cliente_id: string | null
+          data_criacao: string | null
+          email: string
+          id: string
+          interesse: string | null
+          nome: string
+          telefone: string | null
+        }
+        Insert: {
+          cliente_id?: string | null
+          data_criacao?: string | null
+          email: string
+          id?: string
+          interesse?: string | null
+          nome: string
+          telefone?: string | null
+        }
+        Update: {
+          cliente_id?: string | null
+          data_criacao?: string | null
+          email?: string
+          id?: string
+          interesse?: string | null
+          nome?: string
+          telefone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
