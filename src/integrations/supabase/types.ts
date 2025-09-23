@@ -51,7 +51,15 @@ export type Database = {
           user_id?: string
           webhook_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_clientes_tema"
+            columns: ["tema_id"]
+            isOneToOne: false
+            referencedRelation: "temas_landing"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       leads: {
         Row: {

@@ -30,12 +30,17 @@ interface Cliente {
   dominio_personalizado?: string;
   tema_id: number;
   criado_em: string;
-  temas_landing?: { nome: string } | null;
+}
+
+interface Tema {
+  id: number;
+  nome: string;
 }
 
 const ClienteDetalhes = () => {
   const { clienteId } = useParams<{ clienteId: string }>();
   const [cliente, setCliente] = useState<Cliente | null>(null);
+  const [tema, setTema] = useState<Tema | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
@@ -47,24 +52,26 @@ const ClienteDetalhes = () => {
 
   const fetchCliente = async () => {
     try {
-      const { data, error } = await supabase
+      // Buscar dados do cliente
+      const { data: clienteData, error: clienteError } = await supabase
         .from("clientes")
-        .select(`
-          id,
-          nome,
-          email,
-          logo_url,
-          webhook_url,
-          dominio_personalizado,
-          tema_id,
-          criado_em,
-          temas_landing!inner(nome)
-        `)
+        .select("*")
         .eq("id", clienteId)
         .single();
 
-      if (error) throw error;
-      setCliente(data as Cliente);
+      if (clienteError) throw clienteError;
+
+      // Buscar tema associado
+      const { data: temaData, error: temaError } = await supabase
+        .from("temas_landing")
+        .select("*")
+        .eq("id", clienteData.tema_id)
+        .single();
+
+      if (temaError) throw temaError;
+
+      setCliente(clienteData);
+      setTema(temaData);
     } catch (error: any) {
       console.error("Erro ao buscar cliente:", error);
       toast({
@@ -80,6 +87,23 @@ const ClienteDetalhes = () => {
   const handleTemaSelect = (temaId: number) => {
     if (cliente) {
       setCliente({ ...cliente, tema_id: temaId });
+      // Buscar novo tema
+      fetchTema(temaId);
+    }
+  };
+
+  const fetchTema = async (temaId: number) => {
+    try {
+      const { data, error } = await supabase
+        .from("temas_landing")
+        .select("*")
+        .eq("id", temaId)
+        .single();
+
+      if (error) throw error;
+      setTema(data);
+    } catch (error: any) {
+      console.error("Erro ao buscar tema:", error);
     }
   };
 
@@ -160,7 +184,7 @@ const ClienteDetalhes = () => {
                     <CardDescription className="text-lg">{cliente.email}</CardDescription>
                     <div className="flex gap-2 mt-2">
                       <Badge variant="secondary">
-                        Tema: {cliente.temas_landing?.nome || `Tema ${cliente.tema_id}`}
+                        Tema: {tema?.nome || `Tema ${cliente.tema_id}`}
                       </Badge>
                       {cliente.webhook_url && (
                         <Badge variant="outline">Webhook Ativo</Badge>
