@@ -202,7 +202,7 @@ const EditarLandingPage = ({ clienteId }: EditarLandingPageProps) => {
                 onChange={handleLogoUpload}
                 className="flex-1"
               />
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" onClick={() => document.getElementById('logo')?.click()}>
                 <Upload className="h-4 w-4 mr-2" />
                 Upload
               </Button>
@@ -216,6 +216,9 @@ const EditarLandingPage = ({ clienteId }: EditarLandingPageProps) => {
                 />
               </div>
             )}
+            <p className="text-sm text-muted-foreground">
+              📌 Upload de logo será implementado com Supabase Storage
+            </p>
           </div>
 
           <div className="flex gap-4">

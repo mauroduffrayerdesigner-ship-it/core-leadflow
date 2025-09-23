@@ -10,11 +10,12 @@ import { Upload, FileText, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface ImportarCSVProps {
-  clienteId: string;
-  onImportComplete: () => void;
+  clienteId?: string;
+  onImportComplete?: () => void;
+  onSuccess?: () => void;
 }
 
-const ImportarCSV = ({ clienteId, onImportComplete }: ImportarCSVProps) => {
+const ImportarCSV = ({ clienteId, onImportComplete, onSuccess }: ImportarCSVProps) => {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState<string[][]>([]);
@@ -138,11 +139,15 @@ const ImportarCSV = ({ clienteId, onImportComplete }: ImportarCSVProps) => {
           return;
         }
 
-        const { error } = await supabase
-          .from("leads")
-          .insert(leads);
-
-        if (error) throw error;
+        // Inserir leads usando edge function para webhook
+        for (const lead of leads) {
+          await supabase.functions.invoke('webhook-lead', {
+            body: {
+              ...lead,
+              origem: 'csv'
+            }
+          });
+        }
 
         toast({
           title: "Sucesso!",
@@ -156,7 +161,8 @@ const ImportarCSV = ({ clienteId, onImportComplete }: ImportarCSVProps) => {
         setMappings({});
         if (fileInputRef.current) fileInputRef.current.value = '';
         
-        onImportComplete();
+        if (onImportComplete) onImportComplete();
+        if (onSuccess) onSuccess();
       };
       reader.readAsText(file);
     } catch (error: any) {

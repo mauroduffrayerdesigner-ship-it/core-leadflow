@@ -45,39 +45,19 @@ const LandingPageRenderer = ({ cliente, isPreview = false }: LandingPageProps) =
 
     setLoading(true);
     try {
-      const { error } = await supabase
-        .from("leads")
-        .insert({
+      // Usar edge function para criar lead e enviar webhook
+      const { data, error } = await supabase.functions.invoke('webhook-lead', {
+        body: {
           cliente_id: cliente.id,
           nome: formData.nome,
           email: formData.email,
-          telefone: formData.telefone,
-          interesse: formData.interesse,
-          origem: "formulario",
-        });
+          telefone: formData.telefone || null,
+          interesse: formData.interesse || null,
+          origem: 'formulario'
+        }
+      });
 
       if (error) throw error;
-
-      // Enviar webhook se configurado
-      if (cliente.webhook_url) {
-        try {
-          await fetch(cliente.webhook_url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              cliente_id: cliente.id,
-              nome: formData.nome,
-              email: formData.email,
-              telefone: formData.telefone,
-              interesse: formData.interesse,
-              origem: "formulario",
-              data_criacao: new Date().toISOString(),
-            }),
-          });
-        } catch (webhookError) {
-          console.error("Erro ao enviar webhook:", webhookError);
-        }
-      }
 
       toast({
         title: "Sucesso!",

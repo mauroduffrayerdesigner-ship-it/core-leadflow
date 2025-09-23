@@ -7,9 +7,12 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Mail, Phone, MessageSquare, Users } from "lucide-react";
+import { Plus, Mail, Phone, MessageSquare, Users, Filter, Calendar } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import Layout from "@/components/Layout";
+import ExportarCSV from "@/components/leads/ExportarCSV";
+import ImportarCSV from "@/components/leads/ImportarCSV";
+import FiltrosLeads from "@/components/leads/FiltrosLeads";
 
 interface Lead {
   id: string;
@@ -19,6 +22,8 @@ interface Lead {
   interesse?: string;
   data_criacao: string;
   cliente_id: string;
+  origem?: string;
+  status?: string;
   clientes?: {
     nome: string;
   };
@@ -34,6 +39,13 @@ const Leads = () => {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [filtros, setFiltros] = useState({
+    origem: "",
+    status: "",
+    cliente_id: "",
+    data_inicio: "",
+    data_fim: ""
+  });
   const [formData, setFormData] = useState({
     nome: "",
     email: "",
@@ -50,13 +62,22 @@ const Leads = () => {
   const fetchData = async () => {
     try {
       // Buscar leads com informações do cliente
-      const { data: leadsData, error: leadsError } = await supabase
+      let query = supabase
         .from("leads")
         .select(`
           *,
           clientes(nome)
         `)
         .order("data_criacao", { ascending: false });
+
+      // Aplicar filtros
+      if (filtros.origem) query = query.eq("origem", filtros.origem);
+      if (filtros.status) query = query.eq("status", filtros.status);
+      if (filtros.cliente_id) query = query.eq("cliente_id", filtros.cliente_id);
+      if (filtros.data_inicio) query = query.gte("data_criacao", filtros.data_inicio);
+      if (filtros.data_fim) query = query.lte("data_criacao", filtros.data_fim + "T23:59:59");
+
+      const { data: leadsData, error: leadsError } = await query;
 
       if (leadsError) throw leadsError;
 
@@ -85,15 +106,17 @@ const Leads = () => {
     e.preventDefault();
     
     try {
-      const { error } = await supabase
-        .from("leads")
-        .insert({
+      // Usar edge function para criar lead com webhook
+      const { error } = await supabase.functions.invoke('webhook-lead', {
+        body: {
+          cliente_id: formData.cliente_id,
           nome: formData.nome,
           email: formData.email,
           telefone: formData.telefone || null,
           interesse: formData.interesse || null,
-          cliente_id: formData.cliente_id,
-        });
+          origem: 'manual'
+        }
+      });
 
       if (error) throw error;
 
@@ -131,7 +154,7 @@ const Leads = () => {
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-3xl font-bold">Leads</h1>
           <p className="text-muted-foreground">
@@ -139,7 +162,10 @@ const Leads = () => {
           </p>
         </div>
         
-        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <div className="flex gap-2">
+          <ExportarCSV />
+          <ImportarCSV onSuccess={fetchData} />
+          <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => {
               setFormData({
@@ -241,8 +267,27 @@ const Leads = () => {
               </div>
             </form>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
+
+      {/* Filtros */}
+      <FiltrosLeads
+        clientes={clientes}
+        filtros={filtros}
+        onFiltrosChange={setFiltros}
+        onAplicar={fetchData}
+        onLimpar={() => {
+          setFiltros({
+            origem: "",
+            status: "",
+            cliente_id: "",
+            data_inicio: "",
+            data_fim: ""
+          });
+          fetchData();
+        }}
+      />
 
       {leads.length === 0 ? (
         <Card>
@@ -292,12 +337,26 @@ const Leads = () => {
                     <span className="text-sm">{lead.email}</span>
                   </div>
                   
-                  {lead.telefone && (
-                    <div className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">{lead.telefone}</span>
-                    </div>
-                  )}
+                   {lead.telefone && (
+                     <div className="flex items-center gap-2">
+                       <Phone className="h-4 w-4 text-muted-foreground" />
+                       <span className="text-sm">{lead.telefone}</span>
+                     </div>
+                   )}
+
+                   <div className="flex items-center gap-2">
+                     <span className="text-xs px-2 py-1 bg-muted rounded-full">
+                       {lead.origem || 'formulario'}
+                     </span>
+                     <span className={`text-xs px-2 py-1 rounded-full ${
+                       lead.status === 'convertido' ? 'bg-green-100 text-green-800' :
+                       lead.status === 'qualificado' ? 'bg-blue-100 text-blue-800' :
+                       lead.status === 'descartado' ? 'bg-red-100 text-red-800' :
+                       'bg-gray-100 text-gray-800'
+                     }`}>
+                       {lead.status || 'novo'}
+                     </span>
+                   </div>
                   
                   {lead.interesse && (
                     <div className="md:col-span-2 flex items-start gap-2">
