@@ -49,7 +49,17 @@ const ClienteDetalhes = () => {
     try {
       const { data, error } = await supabase
         .from("clientes")
-        .select("*, temas_landing(nome)")
+        .select(`
+          id,
+          nome,
+          email,
+          logo_url,
+          webhook_url,
+          dominio_personalizado,
+          tema_id,
+          criado_em,
+          temas_landing!inner(nome)
+        `)
         .eq("id", clienteId)
         .single();
 
