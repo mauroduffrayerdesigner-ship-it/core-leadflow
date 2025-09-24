@@ -23,6 +23,7 @@ export type Database = {
           headline: string | null
           id: string
           logo_url: string | null
+          lp_publica: boolean | null
           nome: string
           subtitulo: string | null
           tema_id: number | null
@@ -38,6 +39,7 @@ export type Database = {
           headline?: string | null
           id?: string
           logo_url?: string | null
+          lp_publica?: boolean | null
           nome: string
           subtitulo?: string | null
           tema_id?: number | null
@@ -53,6 +55,7 @@ export type Database = {
           headline?: string | null
           id?: string
           logo_url?: string | null
+          lp_publica?: boolean | null
           nome?: string
           subtitulo?: string | null
           tema_id?: number | null
