@@ -48,7 +48,7 @@ const FiltrosLeads = ({
                 <SelectValue placeholder="Todos" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos</SelectItem>
+                <SelectItem value="all">Todos</SelectItem>
                 {clientes.map((cliente) => (
                   <SelectItem key={cliente.id} value={cliente.id}>
                     {cliente.nome}
@@ -65,7 +65,7 @@ const FiltrosLeads = ({
                 <SelectValue placeholder="Todas" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todas</SelectItem>
+                <SelectItem value="all">Todas</SelectItem>
                 <SelectItem value="formulario">Formulário</SelectItem>
                 <SelectItem value="manual">Manual</SelectItem>
                 <SelectItem value="csv">CSV</SelectItem>
@@ -81,7 +81,7 @@ const FiltrosLeads = ({
                 <SelectValue placeholder="Todos" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos</SelectItem>
+                <SelectItem value="all">Todos</SelectItem>
                 <SelectItem value="novo">Novo</SelectItem>
                 <SelectItem value="qualificado">Qualificado</SelectItem>
                 <SelectItem value="convertido">Convertido</SelectItem>

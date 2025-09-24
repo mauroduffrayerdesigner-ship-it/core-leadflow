@@ -40,9 +40,9 @@ const Leads = () => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filtros, setFiltros] = useState({
-    origem: "",
-    status: "",
-    cliente_id: "",
+    origem: "all",
+    status: "all",
+    cliente_id: "all",
     data_inicio: "",
     data_fim: ""
   });
@@ -71,9 +71,9 @@ const Leads = () => {
         .order("data_criacao", { ascending: false });
 
       // Aplicar filtros
-      if (filtros.origem) query = query.eq("origem", filtros.origem);
-      if (filtros.status) query = query.eq("status", filtros.status);
-      if (filtros.cliente_id) query = query.eq("cliente_id", filtros.cliente_id);
+      if (filtros.origem && filtros.origem !== "all") query = query.eq("origem", filtros.origem);
+      if (filtros.status && filtros.status !== "all") query = query.eq("status", filtros.status);
+      if (filtros.cliente_id && filtros.cliente_id !== "all") query = query.eq("cliente_id", filtros.cliente_id);
       if (filtros.data_inicio) query = query.gte("data_criacao", filtros.data_inicio);
       if (filtros.data_fim) query = query.lte("data_criacao", filtros.data_fim + "T23:59:59");
 
@@ -279,9 +279,9 @@ const Leads = () => {
         onAplicar={fetchData}
         onLimpar={() => {
           setFiltros({
-            origem: "",
-            status: "",
-            cliente_id: "",
+            origem: "all",
+            status: "all",
+            cliente_id: "all",
             data_inicio: "",
             data_fim: ""
           });
