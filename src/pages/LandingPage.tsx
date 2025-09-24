@@ -7,11 +7,13 @@ import { Card, CardContent } from "@/components/ui/card";
 interface Cliente {
   id: string;
   nome: string;
-  email: string;
   logo_url?: string;
   tema_id: number;
   webhook_url?: string;
   dominio_personalizado?: string;
+  headline?: string;
+  subtitulo?: string;
+  texto_cta?: string;
 }
 
 const LandingPage = () => {
@@ -30,8 +32,8 @@ const LandingPage = () => {
     try {
       console.log("Buscando cliente com ID:", clienteId);
       const { data, error } = await supabase
-        .from("clientes")
-        .select("id, nome, email, logo_url, tema_id, webhook_url, dominio_personalizado")
+        .from("landing_page_public")
+        .select("id, nome, logo_url, tema_id, webhook_url, dominio_personalizado, headline, subtitulo, texto_cta")
         .eq("id", clienteId)
         .single();
 

@@ -9,7 +9,6 @@ import { supabase } from "@/integrations/supabase/client";
 interface Cliente {
   id: string;
   nome: string;
-  email: string;
   logo_url?: string;
   tema_id: number;
   webhook_url?: string;
