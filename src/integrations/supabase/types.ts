@@ -121,6 +121,13 @@ export type Database = {
             referencedRelation: "clientes"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "leads_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "landing_page_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       metricas_cliente: {
@@ -171,6 +178,13 @@ export type Database = {
             referencedRelation: "clientes"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "metricas_cliente_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "landing_page_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       temas_landing: {
@@ -199,7 +213,53 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      landing_page_public: {
+        Row: {
+          dominio_personalizado: string | null
+          headline: string | null
+          id: string | null
+          logo_url: string | null
+          lp_publica: boolean | null
+          nome: string | null
+          subtitulo: string | null
+          tema_id: number | null
+          texto_cta: string | null
+          webhook_url: string | null
+        }
+        Insert: {
+          dominio_personalizado?: string | null
+          headline?: string | null
+          id?: string | null
+          logo_url?: string | null
+          lp_publica?: boolean | null
+          nome?: string | null
+          subtitulo?: string | null
+          tema_id?: number | null
+          texto_cta?: string | null
+          webhook_url?: string | null
+        }
+        Update: {
+          dominio_personalizado?: string | null
+          headline?: string | null
+          id?: string | null
+          logo_url?: string | null
+          lp_publica?: boolean | null
+          nome?: string | null
+          subtitulo?: string | null
+          tema_id?: number | null
+          texto_cta?: string | null
+          webhook_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_clientes_tema"
+            columns: ["tema_id"]
+            isOneToOne: false
+            referencedRelation: "temas_landing"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       [_ in never]: never
