@@ -73,6 +73,108 @@ export type Database = {
           },
         ]
       }
+      email_templates: {
+        Row: {
+          assunto: string
+          ativo: boolean | null
+          corpo: string
+          criado_em: string
+          id: string
+          nome: string
+          variaveis: string[] | null
+        }
+        Insert: {
+          assunto: string
+          ativo?: boolean | null
+          corpo: string
+          criado_em?: string
+          id?: string
+          nome: string
+          variaveis?: string[] | null
+        }
+        Update: {
+          assunto?: string
+          ativo?: boolean | null
+          corpo?: string
+          criado_em?: string
+          id?: string
+          nome?: string
+          variaveis?: string[] | null
+        }
+        Relationships: []
+      }
+      lead_interactions: {
+        Row: {
+          criado_em: string
+          criado_por: string | null
+          dados_extras: Json | null
+          descricao: string
+          id: string
+          lead_id: string
+          tipo: string
+        }
+        Insert: {
+          criado_em?: string
+          criado_por?: string | null
+          dados_extras?: Json | null
+          descricao: string
+          id?: string
+          lead_id: string
+          tipo: string
+        }
+        Update: {
+          criado_em?: string
+          criado_por?: string | null
+          dados_extras?: Json | null
+          descricao?: string
+          id?: string
+          lead_id?: string
+          tipo?: string
+        }
+        Relationships: []
+      }
+      lead_tag_relations: {
+        Row: {
+          criado_em: string
+          id: string
+          lead_id: string
+          tag_id: string
+        }
+        Insert: {
+          criado_em?: string
+          id?: string
+          lead_id: string
+          tag_id: string
+        }
+        Update: {
+          criado_em?: string
+          id?: string
+          lead_id?: string
+          tag_id?: string
+        }
+        Relationships: []
+      }
+      lead_tags: {
+        Row: {
+          cor: string
+          criado_em: string
+          id: string
+          nome: string
+        }
+        Insert: {
+          cor?: string
+          criado_em?: string
+          id?: string
+          nome: string
+        }
+        Update: {
+          cor?: string
+          criado_em?: string
+          id?: string
+          nome?: string
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           cliente_id: string | null
