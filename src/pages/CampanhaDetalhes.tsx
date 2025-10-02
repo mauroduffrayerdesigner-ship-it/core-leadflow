@@ -7,6 +7,9 @@ import { useToast } from "@/hooks/use-toast";
 import Layout from "@/components/Layout";
 import { Loader2 } from "lucide-react";
 import EditarLandingPageCampanha from "@/components/campanha/EditarLandingPageCampanha";
+import ConfiguracoesCampanha from "@/components/campanha/ConfiguracoesCampanha";
+import LeadsCampanha from "@/components/campanha/LeadsCampanha";
+import MetricasCampanha from "@/components/campanha/MetricasCampanha";
 
 interface Campanha {
   id: string;
@@ -103,51 +106,15 @@ const CampanhaDetalhes = () => {
           </TabsContent>
 
           <TabsContent value="leads">
-            <Card>
-              <CardHeader>
-                <CardTitle>Leads da Campanha</CardTitle>
-                <CardDescription>
-                  Visualize todos os leads capturados nesta campanha
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Funcionalidade em desenvolvimento
-                </p>
-              </CardContent>
-            </Card>
+            <LeadsCampanha campanhaId={campanhaId!} />
           </TabsContent>
 
           <TabsContent value="metricas">
-            <Card>
-              <CardHeader>
-                <CardTitle>Métricas da Campanha</CardTitle>
-                <CardDescription>
-                  Acompanhe o desempenho desta campanha
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Funcionalidade em desenvolvimento
-                </p>
-              </CardContent>
-            </Card>
+            <MetricasCampanha campanhaId={campanhaId!} />
           </TabsContent>
 
           <TabsContent value="configuracoes">
-            <Card>
-              <CardHeader>
-                <CardTitle>Configurações da Campanha</CardTitle>
-                <CardDescription>
-                  Gerencie webhook, domínio personalizado e outras configurações
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Funcionalidade em desenvolvimento
-                </p>
-              </CardContent>
-            </Card>
+            <ConfiguracoesCampanha campanhaId={campanhaId!} />
           </TabsContent>
         </Tabs>
       </div>
