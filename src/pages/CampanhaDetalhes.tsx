@@ -1,0 +1,158 @@
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import Layout from "@/components/Layout";
+import { Loader2 } from "lucide-react";
+import EditarLandingPageCampanha from "@/components/campanha/EditarLandingPageCampanha";
+
+interface Campanha {
+  id: string;
+  cliente_id: string;
+  nome: string;
+  descricao?: string;
+  status: string;
+  tema_id: number;
+  headline?: string;
+  subtitulo?: string;
+  texto_cta?: string;
+  logo_url?: string;
+  webhook_url?: string;
+  dominio_personalizado?: string;
+}
+
+const CampanhaDetalhes = () => {
+  const { campanhaId } = useParams();
+  const [campanha, setCampanha] = useState<Campanha | null>(null);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (campanhaId) {
+      fetchCampanha();
+    }
+  }, [campanhaId]);
+
+  const fetchCampanha = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("campanhas")
+        .select("*")
+        .eq("id", campanhaId)
+        .single();
+
+      if (error) throw error;
+      setCampanha(data);
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: "Não foi possível carregar os dados da campanha.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!campanha) {
+    return (
+      <Layout>
+        <div className="container mx-auto px-4 py-8">
+          <Card>
+            <CardContent className="p-8 text-center">
+              <p className="text-muted-foreground">Campanha não encontrada.</p>
+            </CardContent>
+          </Card>
+        </div>
+      </Layout>
+    );
+  }
+
+  return (
+    <Layout>
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">{campanha.nome}</h1>
+          {campanha.descricao && (
+            <p className="text-muted-foreground">{campanha.descricao}</p>
+          )}
+        </div>
+
+        <Tabs defaultValue="landing" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="landing">Landing Page</TabsTrigger>
+            <TabsTrigger value="leads">Leads</TabsTrigger>
+            <TabsTrigger value="metricas">Métricas</TabsTrigger>
+            <TabsTrigger value="configuracoes">Configurações</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="landing">
+            <EditarLandingPageCampanha campanhaId={campanhaId!} />
+          </TabsContent>
+
+          <TabsContent value="leads">
+            <Card>
+              <CardHeader>
+                <CardTitle>Leads da Campanha</CardTitle>
+                <CardDescription>
+                  Visualize todos os leads capturados nesta campanha
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Funcionalidade em desenvolvimento
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="metricas">
+            <Card>
+              <CardHeader>
+                <CardTitle>Métricas da Campanha</CardTitle>
+                <CardDescription>
+                  Acompanhe o desempenho desta campanha
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Funcionalidade em desenvolvimento
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="configuracoes">
+            <Card>
+              <CardHeader>
+                <CardTitle>Configurações da Campanha</CardTitle>
+                <CardDescription>
+                  Gerencie webhook, domínio personalizado e outras configurações
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Funcionalidade em desenvolvimento
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </Layout>
+  );
+};
+
+export default CampanhaDetalhes;

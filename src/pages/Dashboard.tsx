@@ -85,10 +85,10 @@ const Dashboard = () => {
             </h1>
           </div>
           <p className="text-xl text-muted-foreground mb-4">
-            Plataforma SaaS completa para captura de leads com landing pages otimizadas
+            Sistema completo para captura de leads com landing pages otimizadas
           </p>
           <Badge variant="secondary" className="text-sm px-4 py-2 animate-pulse-slow">
-            🚀 Sistema SaaS Ativo
+            🚀 Sistema Ativo
           </Badge>
         </div>
         
@@ -165,10 +165,10 @@ const Dashboard = () => {
           <Button 
             size="lg" 
             className="h-24 flex-col gap-2"
-            onClick={() => window.location.href = "/clientes"}
+            onClick={() => window.location.href = "/campanhas"}
           >
             <Building className="h-6 w-6" />
-            Gerenciar Clientes
+            Gerenciar Campanhas
           </Button>
           
           <Button 

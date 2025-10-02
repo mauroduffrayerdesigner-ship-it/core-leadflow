@@ -59,7 +59,7 @@ const Layout = ({ children }: LayoutProps) => {
 
   const navigationItems = [
     { path: "/dashboard", label: "Dashboard", icon: BarChart3 },
-    { path: "/clientes", label: "Clientes", icon: Building },
+    { path: "/campanhas", label: "Campanhas", icon: Building },
     { path: "/leads", label: "Leads", icon: Users },
     { path: "/captura", label: "Captura", icon: Share2 },
   ];

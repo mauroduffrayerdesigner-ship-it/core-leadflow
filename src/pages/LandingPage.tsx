@@ -17,24 +17,24 @@ interface Cliente {
 }
 
 const LandingPage = () => {
-  const { clienteId } = useParams<{ clienteId: string }>();
+  const { campanhaId } = useParams<{ campanhaId: string }>();
   const [cliente, setCliente] = useState<Cliente | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (clienteId) {
+    if (campanhaId) {
       fetchCliente();
     }
-  }, [clienteId]);
+  }, [campanhaId]);
 
   const fetchCliente = async () => {
     try {
-      console.log("Buscando cliente com ID:", clienteId);
+      console.log("Buscando campanha com ID:", campanhaId);
       const { data, error } = await supabase
-        .from("landing_page_public")
+        .from("landing_page_campanha_public")
         .select("id, nome, logo_url, tema_id, webhook_url, dominio_personalizado, headline, subtitulo, texto_cta")
-        .eq("id", clienteId)
+        .eq("id", campanhaId)
         .single();
 
       console.log("Resultado da consulta:", { data, error });
