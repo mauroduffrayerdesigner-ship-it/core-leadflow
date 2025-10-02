@@ -14,6 +14,82 @@ export type Database = {
   }
   public: {
     Tables: {
+      campanhas: {
+        Row: {
+          atualizado_em: string
+          cliente_id: string
+          configuracoes: Json | null
+          criado_em: string
+          descricao: string | null
+          dominio_personalizado: string | null
+          headline: string | null
+          id: string
+          logo_url: string | null
+          nome: string
+          status: string
+          subtitulo: string | null
+          tema_id: number | null
+          texto_cta: string | null
+          webhook_url: string | null
+        }
+        Insert: {
+          atualizado_em?: string
+          cliente_id: string
+          configuracoes?: Json | null
+          criado_em?: string
+          descricao?: string | null
+          dominio_personalizado?: string | null
+          headline?: string | null
+          id?: string
+          logo_url?: string | null
+          nome: string
+          status?: string
+          subtitulo?: string | null
+          tema_id?: number | null
+          texto_cta?: string | null
+          webhook_url?: string | null
+        }
+        Update: {
+          atualizado_em?: string
+          cliente_id?: string
+          configuracoes?: Json | null
+          criado_em?: string
+          descricao?: string | null
+          dominio_personalizado?: string | null
+          headline?: string | null
+          id?: string
+          logo_url?: string | null
+          nome?: string
+          status?: string
+          subtitulo?: string | null
+          tema_id?: number | null
+          texto_cta?: string | null
+          webhook_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campanhas_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campanhas_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "landing_page_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campanhas_tema_id_fkey"
+            columns: ["tema_id"]
+            isOneToOne: false
+            referencedRelation: "temas_landing"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clientes: {
         Row: {
           configuracoes: Json | null
@@ -177,6 +253,7 @@ export type Database = {
       }
       leads: {
         Row: {
+          campanha_id: string | null
           cliente_id: string | null
           data_atualizacao: string | null
           data_criacao: string | null
@@ -190,6 +267,7 @@ export type Database = {
           telefone: string | null
         }
         Insert: {
+          campanha_id?: string | null
           cliente_id?: string | null
           data_atualizacao?: string | null
           data_criacao?: string | null
@@ -203,6 +281,7 @@ export type Database = {
           telefone?: string | null
         }
         Update: {
+          campanha_id?: string | null
           cliente_id?: string | null
           data_atualizacao?: string | null
           data_criacao?: string | null
@@ -217,6 +296,20 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "leads_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
+            referencedRelation: "campanhas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
+            referencedRelation: "landing_page_campanha_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "leads_cliente_id_fkey"
             columns: ["cliente_id"]
             isOneToOne: false
@@ -228,6 +321,63 @@ export type Database = {
             columns: ["cliente_id"]
             isOneToOne: false
             referencedRelation: "landing_page_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      metricas_campanha: {
+        Row: {
+          campanha_id: string | null
+          criado_em: string | null
+          data_metrica: string | null
+          id: string
+          leads_convertidos: number | null
+          leads_csv: number | null
+          leads_formulario: number | null
+          leads_manual: number | null
+          leads_n8n: number | null
+          leads_qualificados: number | null
+          total_leads: number | null
+        }
+        Insert: {
+          campanha_id?: string | null
+          criado_em?: string | null
+          data_metrica?: string | null
+          id?: string
+          leads_convertidos?: number | null
+          leads_csv?: number | null
+          leads_formulario?: number | null
+          leads_manual?: number | null
+          leads_n8n?: number | null
+          leads_qualificados?: number | null
+          total_leads?: number | null
+        }
+        Update: {
+          campanha_id?: string | null
+          criado_em?: string | null
+          data_metrica?: string | null
+          id?: string
+          leads_convertidos?: number | null
+          leads_csv?: number | null
+          leads_formulario?: number | null
+          leads_manual?: number | null
+          leads_n8n?: number | null
+          leads_qualificados?: number | null
+          total_leads?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "metricas_campanha_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
+            referencedRelation: "campanhas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "metricas_campanha_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
+            referencedRelation: "landing_page_campanha_public"
             referencedColumns: ["id"]
           },
         ]
@@ -315,6 +465,29 @@ export type Database = {
       }
     }
     Views: {
+      landing_page_campanha_public: {
+        Row: {
+          dominio_personalizado: string | null
+          headline: string | null
+          id: string | null
+          logo_url: string | null
+          lp_publica: boolean | null
+          nome: string | null
+          subtitulo: string | null
+          tema_id: number | null
+          texto_cta: string | null
+          webhook_url: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campanhas_tema_id_fkey"
+            columns: ["tema_id"]
+            isOneToOne: false
+            referencedRelation: "temas_landing"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       landing_page_public: {
         Row: {
           dominio_personalizado: string | null
