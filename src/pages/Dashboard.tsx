@@ -40,20 +40,21 @@ const Dashboard = () => {
         .select("*", { count: "exact", head: true })
         .gte("data_criacao", inicioMes.toISOString());
 
-      // Total de clientes
-      const { count: totalClientes } = await supabase
-        .from("clientes")
-        .select("*", { count: "exact", head: true });
+      // Total de campanhas ativas
+      const { count: totalCampanhas } = await supabase
+        .from("campanhas")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "ativa");
 
-      // Landing pages ativas (clientes com tema configurado)
+      // Landing pages ativas (campanhas com tema configurado)
       const { count: landingPagesAtivas } = await supabase
-        .from("clientes")
+        .from("campanhas")
         .select("*", { count: "exact", head: true })
         .not("tema_id", "is", null);
 
       // Calcular taxa de conversão média
       const { data: metricas } = await supabase
-        .from("metricas_cliente")
+        .from("metricas_campanha")
         .select("total_leads, leads_convertidos");
 
       let taxaConversaoMedia = 0;
@@ -66,7 +67,7 @@ const Dashboard = () => {
       setStats({
         totalLeads: totalLeads || 0,
         leadsEsteMs: leadsEsteMs || 0,
-        totalClientes: totalClientes || 0,
+        totalClientes: totalCampanhas || 0,
         landingPagesAtivas: landingPagesAtivas || 0,
         taxaConversaoMedia,
       });
@@ -104,9 +105,9 @@ const Dashboard = () => {
           />
 
           <StatCard
-            title="Clientes Ativos"
+            title="Campanhas Ativas"
             value={stats.totalClientes}
-            description="Clientes cadastrados"
+            description="Campanhas em execução"
             icon={<Building className="h-4 w-4" />}
             trend={{ value: 25, label: "crescimento" }}
             className="shadow-brand-secondary"
@@ -153,7 +154,7 @@ const Dashboard = () => {
               Analytics Avançados
             </CardTitle>
             <CardDescription className="text-base">
-              Visão completa das métricas de todos os clientes em tempo real
+              Visão completa das métricas de todas as campanhas em tempo real
             </CardDescription>
           </CardHeader>
           <CardContent>

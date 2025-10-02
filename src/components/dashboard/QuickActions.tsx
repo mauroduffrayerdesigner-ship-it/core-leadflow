@@ -14,9 +14,9 @@ export const QuickActions = () => {
       </CardHeader>
       <CardContent className="space-y-3">
         <Button asChild className="w-full justify-start" variant="outline">
-          <Link to="/clientes">
+          <Link to="/campanhas">
             <Plus className="mr-2 h-4 w-4" />
-            Adicionar Cliente
+            Nova Campanha
           </Link>
         </Button>
         
