@@ -12,6 +12,8 @@ import previewCorporativo from "@/assets/preview-corporativo-elegante.jpg";
 import previewCriativo from "@/assets/preview-criativo-colorido.jpg";
 import previewEcommerce from "@/assets/preview-ecommerce-focus.jpg";
 import previewConsultoria from "@/assets/preview-consultoria-premium.jpg";
+import previewVsl from "@/assets/preview-vsl-video.jpg";
+import previewGift from "@/assets/preview-gift-bonus.jpg";
 
 interface Tema {
   id: number;
@@ -138,7 +140,17 @@ const TemasLanding = ({ clienteId, temaSelecionado, onTemaSelect }: TemasLanding
             <CardContent className="space-y-4">
               <div className="h-32 bg-muted rounded-lg overflow-hidden">
                 <img 
-                  src={tema.id === 1 ? previewModerno : tema.id === 2 ? previewTech : tema.id === 3 ? previewCorporativo : tema.id === 4 ? previewCriativo : tema.id === 5 ? previewEcommerce : previewConsultoria} 
+                  src={
+                    tema.id === 1 ? previewModerno :
+                    tema.id === 2 ? previewTech :
+                    tema.id === 3 ? previewCorporativo :
+                    tema.id === 4 ? previewCriativo :
+                    tema.id === 5 ? previewEcommerce :
+                    tema.id === 6 ? previewConsultoria :
+                    tema.id === 7 ? previewVsl :
+                    tema.id === 8 ? previewGift :
+                    previewModerno
+                  } 
                   alt={`Preview ${tema.nome}`}
                   className="w-full h-full object-cover"
                 />
