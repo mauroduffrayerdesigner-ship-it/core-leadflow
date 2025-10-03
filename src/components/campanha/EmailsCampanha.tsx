@@ -96,8 +96,8 @@ const EmailsCampanha = ({ campanhaId }: EmailsCampanhaProps) => {
       setEmailNomeRemetente(data.email_nome_remetente || "");
       setEmailAutoEnvio(data.email_auto_envio || false);
       setTemplateBoasVindasId(data.template_boas_vindas_id || "");
-      setTemaEmailId(data.tema_email_id ? data.tema_email_id.toString() : "");
-      setAssinaturaEmailId(data.assinatura_email_id || "");
+      setTemaEmailId(data.tema_email_id ? data.tema_email_id.toString() : "none");
+      setAssinaturaEmailId(data.assinatura_email_id || "none");
     } catch (error: any) {
       toast({
         title: "Erro",
@@ -178,8 +178,8 @@ const EmailsCampanha = ({ campanhaId }: EmailsCampanhaProps) => {
           email_nome_remetente: emailNomeRemetente,
           email_auto_envio: emailAutoEnvio,
           template_boas_vindas_id: templateBoasVindasId || null,
-          tema_email_id: temaEmailId ? parseInt(temaEmailId) : null,
-          assinatura_email_id: assinaturaEmailId || null,
+          tema_email_id: (temaEmailId && temaEmailId !== "none") ? parseInt(temaEmailId) : null,
+          assinatura_email_id: (assinaturaEmailId && assinaturaEmailId !== "none") ? assinaturaEmailId : null,
         })
         .eq("id", campanhaId);
 
@@ -414,7 +414,7 @@ const EmailsCampanha = ({ campanhaId }: EmailsCampanhaProps) => {
                   <SelectValue placeholder="Selecione um tema" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Nenhum tema</SelectItem>
+                  <SelectItem value="none">Nenhum tema</SelectItem>
                   {temasEmail.map((tema) => (
                     <SelectItem key={tema.id} value={tema.id.toString()}>
                       {tema.nome}
@@ -563,7 +563,7 @@ const EmailsCampanha = ({ campanhaId }: EmailsCampanhaProps) => {
                   <SelectValue placeholder="Selecione uma assinatura" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Nenhuma</SelectItem>
+                  <SelectItem value="none">Nenhuma</SelectItem>
                   {assinaturas.map((assinatura) => (
                     <SelectItem key={assinatura.id} value={assinatura.id}>
                       {assinatura.nome} - {assinatura.cargo || "Sem cargo"}
