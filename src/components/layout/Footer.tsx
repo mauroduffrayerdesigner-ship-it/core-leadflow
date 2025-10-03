@@ -8,11 +8,10 @@ export const Footer = () => {
         <div className="grid md:grid-cols-4 gap-8">
           <div className="col-span-2 md:col-span-1">
             <div className="font-bold text-xl mb-4">
-              <span className="text-primary">CORE</span>
-              <span className="text-secondary"> Capture</span>
+              Plataforma de Marketing e Venda
             </div>
             <p className="text-muted-foreground text-sm mb-4">
-              A plataforma SaaS completa para captura de leads e automação de vendas.
+              A plataforma completa para captura de leads e automação de vendas.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
@@ -111,7 +110,7 @@ export const Footer = () => {
 
         <div className="border-t mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-muted-foreground text-sm">
-            © 2024 CORE Capture. Todos os direitos reservados.
+            © 2024 Plataforma de Marketing e Venda. Todos os direitos reservados.
           </p>
           <div className="flex space-x-6 text-sm text-muted-foreground mt-4 md:mt-0">
             <Link to="/" className="hover:text-foreground transition-colors">

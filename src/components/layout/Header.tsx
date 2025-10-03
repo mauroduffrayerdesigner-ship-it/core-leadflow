@@ -12,8 +12,7 @@ export const Header = () => {
         <Link to="/" className="flex items-center space-x-3">
           <img src="/favicon.svg" alt="CORE" className="h-8 w-8" />
           <div className="font-bold text-xl">
-            <span className="text-primary">CORE</span>
-            <span className="text-secondary"> LeadFlow</span>
+            Plataforma de Marketing e Venda
           </div>
         </Link>
 

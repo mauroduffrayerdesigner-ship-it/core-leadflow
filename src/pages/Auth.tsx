@@ -42,7 +42,7 @@ const Auth = () => {
         
         toast({
           title: "Login realizado com sucesso!",
-          description: "Bem-vindo ao CORE Capture",
+          description: "Bem-vindo à Plataforma de Marketing e Venda",
         });
         navigate("/dashboard");
       } else {
@@ -77,8 +77,7 @@ const Auth = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="text-2xl font-bold mb-2">
-            <span className="text-primary">CORE</span>
-            <span className="text-secondary"> Capture</span>
+            Plataforma de Marketing e Venda
           </div>
           <CardTitle>{isLogin ? "Entrar" : "Criar Conta"}</CardTitle>
           <CardDescription>
