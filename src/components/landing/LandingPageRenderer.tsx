@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { QRCodeSVG } from "qrcode.react";
 
 interface Cliente {
   id: string;
@@ -74,6 +75,12 @@ const LandingPageRenderer = ({ cliente, isPreview = false }: LandingPageProps) =
     } finally {
       setLoading(false);
     }
+  };
+
+  // Gerar URL da landing page
+  const getLandingPageUrl = () => {
+    if (isPreview) return window.location.origin + "/preview";
+    return window.location.href;
   };
 
   const renderTema = () => {
@@ -586,6 +593,185 @@ const LandingPageRenderer = ({ cliente, isPreview = false }: LandingPageProps) =
           </div>
         );
 
+      case 6: // VSL Video
+        return (
+          <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white">
+            <div className="container mx-auto px-4 py-12">
+              <div className="max-w-5xl mx-auto">
+                {cliente.logo_url && (
+                  <div className="text-center mb-8">
+                    <img src={cliente.logo_url} alt={cliente.nome} className="h-16 mx-auto filter brightness-0 invert" />
+                  </div>
+                )}
+                
+                <div className="text-center mb-12">
+                  <h1 className="text-4xl md:text-5xl font-bold mb-4">
+                    {cliente.headline || "Assista Este Vídeo Importante"}
+                  </h1>
+                  <p className="text-xl text-gray-400 mb-8">
+                    {cliente.subtitulo || "Descubra como transformar seus resultados nos próximos minutos"}
+                  </p>
+                </div>
+
+                {/* Video Player Placeholder */}
+                <div className="mb-12">
+                  <div className="aspect-video bg-black rounded-xl overflow-hidden border-4 border-red-500/20 shadow-2xl">
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+                      <div className="text-center">
+                        <div className="w-24 h-24 mx-auto mb-4 bg-red-600 rounded-full flex items-center justify-center cursor-pointer hover:bg-red-700 transition-all transform hover:scale-110">
+                          <div className="w-0 h-0 border-l-[30px] border-l-white border-t-[18px] border-t-transparent border-b-[18px] border-b-transparent ml-2"></div>
+                        </div>
+                        <p className="text-gray-400">Clique para assistir o vídeo</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* CTA Form */}
+                <Card className="max-w-2xl mx-auto bg-gray-800/50 border-red-500/30 backdrop-blur">
+                  <CardContent className="p-8">
+                    <h2 className="text-2xl font-bold mb-2 text-center text-white">
+                      🎁 Garanta Seu Acesso Exclusivo
+                    </h2>
+                    <p className="text-center text-gray-400 mb-6">
+                      Preencha abaixo e receba conteúdo especial
+                    </p>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <Input
+                        placeholder="Seu nome completo"
+                        value={formData.nome}
+                        onChange={(e) => setFormData({...formData, nome: e.target.value})}
+                        className="h-12 bg-gray-700 border-gray-600 text-white"
+                        required
+                      />
+                      <Input
+                        type="email"
+                        placeholder="Seu melhor e-mail"
+                        value={formData.email}
+                        onChange={(e) => setFormData({...formData, email: e.target.value})}
+                        className="h-12 bg-gray-700 border-gray-600 text-white"
+                        required
+                      />
+                      <Input
+                        placeholder="WhatsApp (opcional)"
+                        value={formData.telefone}
+                        onChange={(e) => setFormData({...formData, telefone: e.target.value})}
+                        className="h-12 bg-gray-700 border-gray-600 text-white"
+                      />
+                      <Button type="submit" className="w-full h-14 text-lg bg-red-600 hover:bg-red-700 font-bold" disabled={loading}>
+                        {loading ? "Enviando..." : (cliente.texto_cta || "QUERO ACESSO AGORA!")}
+                      </Button>
+                    </form>
+                  </CardContent>
+                </Card>
+
+                {/* QR Code Section */}
+                <div className="mt-16 text-center">
+                  <p className="text-gray-400 mb-4">Compartilhe esta página:</p>
+                  <div className="inline-block p-4 bg-white rounded-xl">
+                    <QRCodeSVG value={getLandingPageUrl()} size={150} />
+                  </div>
+                  <p className="text-sm text-gray-500 mt-2">{getLandingPageUrl()}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 7: // Gift Bonus
+        return (
+          <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50">
+            <div className="container mx-auto px-4 py-16">
+              <div className="max-w-4xl mx-auto">
+                {cliente.logo_url && (
+                  <div className="text-center mb-8">
+                    <img src={cliente.logo_url} alt={cliente.nome} className="h-16 mx-auto" />
+                  </div>
+                )}
+                
+                <div className="text-center mb-12">
+                  <div className="inline-block px-6 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 rounded-full text-black font-bold mb-4">
+                    🎁 BÔNUS EXCLUSIVO
+                  </div>
+                  <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+                    {cliente.headline || "Presente Especial Para Você"}
+                  </h1>
+                  <p className="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
+                    {cliente.subtitulo || "Cadastre-se agora e ganhe acesso imediato ao seu bônus exclusivo"}
+                  </p>
+                </div>
+
+                {/* Gift Card Visual */}
+                <div className="mb-12 relative">
+                  <div className="bg-gradient-to-br from-amber-400 via-yellow-500 to-orange-500 rounded-3xl p-1 shadow-2xl transform hover:scale-105 transition-transform">
+                    <div className="bg-white rounded-3xl p-12 text-center">
+                      <div className="text-8xl mb-4">🎁</div>
+                      <h3 className="text-3xl font-bold text-gray-900 mb-2">Seu Bônus Exclusivo</h3>
+                      <p className="text-lg text-gray-600 mb-4">Valor estimado: R$ 997,00</p>
+                      <div className="inline-block px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-full text-xl">
+                        100% GRÁTIS
+                      </div>
+                    </div>
+                  </div>
+                  {/* Ribbon */}
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <div className="bg-red-600 text-white px-8 py-2 rounded-full font-bold shadow-lg">
+                      OFERTA LIMITADA
+                    </div>
+                  </div>
+                </div>
+
+                {/* Form */}
+                <Card className="max-w-lg mx-auto shadow-2xl border-2 border-amber-300">
+                  <CardContent className="p-8">
+                    <h2 className="text-2xl font-bold mb-6 text-center">
+                      Resgatar Meu Bônus Agora
+                    </h2>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <Input
+                        placeholder="Nome completo"
+                        value={formData.nome}
+                        onChange={(e) => setFormData({...formData, nome: e.target.value})}
+                        className="h-12 border-amber-300"
+                        required
+                      />
+                      <Input
+                        type="email"
+                        placeholder="E-mail"
+                        value={formData.email}
+                        onChange={(e) => setFormData({...formData, email: e.target.value})}
+                        className="h-12 border-amber-300"
+                        required
+                      />
+                      <Input
+                        placeholder="WhatsApp"
+                        value={formData.telefone}
+                        onChange={(e) => setFormData({...formData, telefone: e.target.value})}
+                        className="h-12 border-amber-300"
+                      />
+                      <Button type="submit" className="w-full h-14 text-lg bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold shadow-lg" disabled={loading}>
+                        {loading ? "Enviando..." : (cliente.texto_cta || "🎁 RESGATAR BÔNUS GRÁTIS")}
+                      </Button>
+                    </form>
+                    <p className="text-center text-sm text-gray-500 mt-4">
+                      ✓ Acesso imediato após cadastro
+                    </p>
+                  </CardContent>
+                </Card>
+
+                {/* QR Code Section */}
+                <div className="mt-16 text-center">
+                  <p className="text-gray-600 mb-4 font-semibold">Compartilhe este presente:</p>
+                  <div className="inline-block p-6 bg-white rounded-2xl shadow-xl border-2 border-amber-300">
+                    <QRCodeSVG value={getLandingPageUrl()} size={150} />
+                  </div>
+                  <p className="text-sm text-gray-500 mt-3">{getLandingPageUrl()}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
       default:
         return (
           <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -595,6 +781,15 @@ const LandingPageRenderer = ({ cliente, isPreview = false }: LandingPageProps) =
                 <p className="text-xl text-gray-600 mb-12">
                   Por favor, selecione um tema válido para sua landing page.
                 </p>
+                
+                {/* QR Code padrão */}
+                <div className="mt-16">
+                  <p className="text-gray-600 mb-4">URL desta página:</p>
+                  <div className="inline-block p-4 bg-white rounded-xl shadow-lg">
+                    <QRCodeSVG value={getLandingPageUrl()} size={150} />
+                  </div>
+                  <p className="text-sm text-gray-500 mt-2">{getLandingPageUrl()}</p>
+                </div>
               </div>
             </div>
           </div>
