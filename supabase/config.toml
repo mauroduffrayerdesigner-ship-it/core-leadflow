@@ -22,6 +22,9 @@ verify_jwt = false
 [functions.update-lead-status] 
 verify_jwt = false
 
+[functions.send-campaign-email]
+verify_jwt = false
+
 [db]
 port = 54322
 

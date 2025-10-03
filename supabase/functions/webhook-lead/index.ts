@@ -1,6 +1,9 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
+const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -13,13 +16,10 @@ serve(async (req) => {
   }
 
   try {
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     if (req.method === 'POST') {
-      const { cliente_id, nome, email, telefone, interesse, origem = 'formulario' } = await req.json();
+      const { cliente_id, campanha_id, nome, email, telefone, interesse, origem = 'formulario' } = await req.json();
 
       console.log('Criando lead:', { cliente_id, nome, email, origem });
 
@@ -28,6 +28,7 @@ serve(async (req) => {
         .from('leads')
         .insert({
           cliente_id,
+          campanha_id,
           nome,
           email,
           telefone,
@@ -89,7 +90,43 @@ serve(async (req) => {
         }
       }
 
-      return new Response(JSON.stringify({ 
+      // 4. Enviar email automático se configurado
+      if (campanha_id) {
+        try {
+          const { data: campanha } = await supabase
+            .from("campanhas")
+            .select("email_auto_envio, template_boas_vindas_id")
+            .eq("id", campanha_id)
+            .single();
+
+          if (campanha?.email_auto_envio && campanha.template_boas_vindas_id) {
+            console.log("Enviando email automático para lead:", leadData.id);
+            
+            const emailResponse = await fetch(
+              `${supabaseUrl}/functions/v1/send-campaign-email`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": `Bearer ${supabaseServiceKey}`,
+                },
+                body: JSON.stringify({
+                  campanhaId: campanha_id,
+                  leadId: leadData.id,
+                  templateId: campanha.template_boas_vindas_id,
+                }),
+              }
+            );
+
+            console.log("Resposta envio de email:", emailResponse.status);
+          }
+        } catch (emailError) {
+          console.error("Erro ao enviar email automático:", emailError);
+          // Não falha a operação se o email der erro
+        }
+      }
+
+      return new Response(JSON.stringify({
         success: true, 
         lead: leadData,
         webhook_sent: !!clienteData?.webhook_url

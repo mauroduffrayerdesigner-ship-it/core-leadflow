@@ -22,6 +22,10 @@ export type Database = {
           criado_em: string
           descricao: string | null
           dominio_personalizado: string | null
+          email_auto_envio: boolean | null
+          email_nome_remetente: string | null
+          email_provider: string | null
+          email_remetente: string | null
           headline: string | null
           id: string
           logo_url: string | null
@@ -29,6 +33,7 @@ export type Database = {
           status: string
           subtitulo: string | null
           tema_id: number | null
+          template_boas_vindas_id: string | null
           texto_cta: string | null
           webhook_url: string | null
         }
@@ -39,6 +44,10 @@ export type Database = {
           criado_em?: string
           descricao?: string | null
           dominio_personalizado?: string | null
+          email_auto_envio?: boolean | null
+          email_nome_remetente?: string | null
+          email_provider?: string | null
+          email_remetente?: string | null
           headline?: string | null
           id?: string
           logo_url?: string | null
@@ -46,6 +55,7 @@ export type Database = {
           status?: string
           subtitulo?: string | null
           tema_id?: number | null
+          template_boas_vindas_id?: string | null
           texto_cta?: string | null
           webhook_url?: string | null
         }
@@ -56,6 +66,10 @@ export type Database = {
           criado_em?: string
           descricao?: string | null
           dominio_personalizado?: string | null
+          email_auto_envio?: boolean | null
+          email_nome_remetente?: string | null
+          email_provider?: string | null
+          email_remetente?: string | null
           headline?: string | null
           id?: string
           logo_url?: string | null
@@ -63,6 +77,7 @@ export type Database = {
           status?: string
           subtitulo?: string | null
           tema_id?: number | null
+          template_boas_vindas_id?: string | null
           texto_cta?: string | null
           webhook_url?: string | null
         }
@@ -86,6 +101,13 @@ export type Database = {
             columns: ["tema_id"]
             isOneToOne: false
             referencedRelation: "temas_landing"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campanhas_template_boas_vindas_id_fkey"
+            columns: ["template_boas_vindas_id"]
+            isOneToOne: false
+            referencedRelation: "email_templates"
             referencedColumns: ["id"]
           },
         ]
@@ -149,35 +171,127 @@ export type Database = {
           },
         ]
       }
+      email_logs: {
+        Row: {
+          assunto: string
+          campanha_id: string | null
+          criado_em: string | null
+          destinatario_email: string
+          destinatario_nome: string | null
+          erro: string | null
+          id: string
+          lead_id: string | null
+          provider_message_id: string | null
+          status: string
+          template_id: string | null
+        }
+        Insert: {
+          assunto: string
+          campanha_id?: string | null
+          criado_em?: string | null
+          destinatario_email: string
+          destinatario_nome?: string | null
+          erro?: string | null
+          id?: string
+          lead_id?: string | null
+          provider_message_id?: string | null
+          status?: string
+          template_id?: string | null
+        }
+        Update: {
+          assunto?: string
+          campanha_id?: string | null
+          criado_em?: string | null
+          destinatario_email?: string
+          destinatario_nome?: string | null
+          erro?: string | null
+          id?: string
+          lead_id?: string | null
+          provider_message_id?: string | null
+          status?: string
+          template_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_logs_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
+            referencedRelation: "campanhas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_logs_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
+            referencedRelation: "landing_page_campanha_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_logs_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_logs_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "email_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_templates: {
         Row: {
           assunto: string
           ativo: boolean | null
+          campanha_id: string | null
           corpo: string
           criado_em: string
           id: string
           nome: string
+          tipo: string | null
           variaveis: string[] | null
         }
         Insert: {
           assunto: string
           ativo?: boolean | null
+          campanha_id?: string | null
           corpo: string
           criado_em?: string
           id?: string
           nome: string
+          tipo?: string | null
           variaveis?: string[] | null
         }
         Update: {
           assunto?: string
           ativo?: boolean | null
+          campanha_id?: string | null
           corpo?: string
           criado_em?: string
           id?: string
           nome?: string
+          tipo?: string | null
           variaveis?: string[] | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "email_templates_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
+            referencedRelation: "campanhas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_templates_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
+            referencedRelation: "landing_page_campanha_public"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       lead_interactions: {
         Row: {

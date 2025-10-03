@@ -10,6 +10,7 @@ import EditarLandingPageCampanha from "@/components/campanha/EditarLandingPageCa
 import ConfiguracoesCampanha from "@/components/campanha/ConfiguracoesCampanha";
 import LeadsCampanha from "@/components/campanha/LeadsCampanha";
 import MetricasCampanha from "@/components/campanha/MetricasCampanha";
+import EmailsCampanha from "@/components/campanha/EmailsCampanha";
 
 interface Campanha {
   id: string;
@@ -98,6 +99,7 @@ const CampanhaDetalhes = () => {
             <TabsTrigger value="landing">Landing Page</TabsTrigger>
             <TabsTrigger value="leads">Leads</TabsTrigger>
             <TabsTrigger value="metricas">Métricas</TabsTrigger>
+            <TabsTrigger value="emails">Emails</TabsTrigger>
             <TabsTrigger value="configuracoes">Configurações</TabsTrigger>
           </TabsList>
 
@@ -111,6 +113,10 @@ const CampanhaDetalhes = () => {
 
           <TabsContent value="metricas">
             <MetricasCampanha campanhaId={campanhaId!} />
+          </TabsContent>
+
+          <TabsContent value="emails">
+            <EmailsCampanha campanhaId={campanhaId!} />
           </TabsContent>
 
           <TabsContent value="configuracoes">
