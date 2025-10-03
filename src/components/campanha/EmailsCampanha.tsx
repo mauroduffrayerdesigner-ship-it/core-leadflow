@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Mail, Send, CheckCircle, XCircle, Clock, Palette, Edit, Trash2, Plus } from "lucide-react";
+import { Loader2, Mail, Send, CheckCircle, XCircle, Clock, Palette, Edit, Trash2, Plus, Check, Eye } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -26,6 +26,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import previewEmailProfissional from "@/assets/preview-email-profissional.jpg";
+import previewEmailModerno from "@/assets/preview-email-moderno.jpg";
+import previewEmailCorporativo from "@/assets/preview-email-corporativo.jpg";
 
 interface EmailsCampanhaProps {
   campanhaId: string;
@@ -396,64 +399,79 @@ const EmailsCampanha = ({ campanhaId }: EmailsCampanhaProps) => {
 
       {/* Temas */}
       <TabsContent value="temas" className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Palette className="h-5 w-5" />
-              Temas de Email
-            </CardTitle>
-            <CardDescription>
-              Escolha um tema visual para seus emails
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Tema Atual</Label>
-              <Select value={temaEmailId} onValueChange={setTemaEmailId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione um tema" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Nenhum tema</SelectItem>
-                  {temasEmail.map((tema) => (
-                    <SelectItem key={tema.id} value={tema.id.toString()}>
-                      {tema.nome}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-bold mb-2">Escolha o Tema dos seus Emails</h2>
+          <p className="text-muted-foreground">
+            Selecione um design profissional para seus emails automáticos
+          </p>
+        </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {temasEmail.map((tema) => (
-                <Card 
-                  key={tema.id} 
-                  className={`cursor-pointer transition-all hover:shadow-lg ${
-                    temaEmailId === tema.id.toString() ? 'ring-2 ring-primary' : ''
-                  }`}
-                  onClick={() => setTemaEmailId(tema.id.toString())}
-                >
-                  <CardHeader>
-                    <CardTitle className="text-base">{tema.nome}</CardTitle>
-                    <CardDescription className="text-xs">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {temasEmail.map((tema) => (
+            <Card 
+              key={tema.id} 
+              className={`relative transition-all duration-200 hover:shadow-lg cursor-pointer ${
+                temaEmailId === tema.id.toString() ? 'ring-2 ring-primary shadow-lg' : ''
+              }`}
+              onClick={() => setTemaEmailId(tema.id.toString())}
+            >
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <CardTitle className="text-lg">{tema.nome}</CardTitle>
+                    <CardDescription className="mt-1">
                       {tema.descricao}
                     </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-xs text-muted-foreground">
-                      <strong>Variáveis:</strong> {tema.variaveis_suportadas?.join(", ")}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                  </div>
+                  {temaEmailId === tema.id.toString() && (
+                    <Badge variant="default" className="ml-2">
+                      <Check className="h-3 w-3 mr-1" />
+                      Ativo
+                    </Badge>
+                  )}
+                </div>
+              </CardHeader>
+              
+              <CardContent className="space-y-4">
+                <div className="h-40 bg-muted rounded-lg overflow-hidden">
+                  <img 
+                    src={
+                      tema.id === 1 ? previewEmailProfissional : 
+                      tema.id === 2 ? previewEmailModerno : 
+                      previewEmailCorporativo
+                    } 
+                    alt={`Preview ${tema.nome}`}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                
+                <div className="text-xs text-muted-foreground bg-muted/50 p-2 rounded">
+                  <strong>Variáveis:</strong> {tema.variaveis_suportadas?.join(", ")}
+                </div>
 
-            <Button onClick={handleSalvar} disabled={salvando}>
-              {salvando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Salvar Tema
-            </Button>
-          </CardContent>
-        </Card>
+                <Button
+                  size="sm"
+                  className="w-full"
+                  variant={temaEmailId === tema.id.toString() ? "secondary" : "default"}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setTemaEmailId(tema.id.toString());
+                  }}
+                  disabled={temaEmailId === tema.id.toString()}
+                >
+                  {temaEmailId === tema.id.toString() ? "Selecionado" : "Selecionar Tema"}
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        <div className="flex justify-center mt-6">
+          <Button onClick={handleSalvar} disabled={salvando} size="lg">
+            {salvando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Salvar Tema Selecionado
+          </Button>
+        </div>
       </TabsContent>
 
       {/* Assinaturas */}
