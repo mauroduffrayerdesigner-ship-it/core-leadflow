@@ -6,13 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Mail, Phone, MessageSquare, Users, Filter, Calendar } from "lucide-react";
+import { Plus, Mail, Phone, MessageSquare, Users, Filter, Calendar, Download, Trash, Edit2, Flame, Clock } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import Layout from "@/components/Layout";
 import ExportarCSV from "@/components/leads/ExportarCSV";
 import ImportarCSV from "@/components/leads/ImportarCSV";
-import FiltrosLeads from "@/components/leads/FiltrosLeads";
 
 interface Lead {
   id: string;
@@ -39,12 +40,15 @@ const Leads = () => {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedLeads, setSelectedLeads] = useState<string[]>([]);
+  const [showFilters, setShowFilters] = useState(true);
   const [filtros, setFiltros] = useState({
     origem: "all",
     status: "all",
     cliente_id: "all",
     data_inicio: "",
-    data_fim: ""
+    data_fim: "",
+    busca: ""
   });
   const [formData, setFormData] = useState({
     nome: "",
@@ -76,6 +80,7 @@ const Leads = () => {
       if (filtros.cliente_id && filtros.cliente_id !== "all") query = query.eq("cliente_id", filtros.cliente_id);
       if (filtros.data_inicio) query = query.gte("data_criacao", filtros.data_inicio);
       if (filtros.data_fim) query = query.lte("data_criacao", filtros.data_fim + "T23:59:59");
+      if (filtros.busca) query = query.or(`nome.ilike.%${filtros.busca}%,email.ilike.%${filtros.busca}%`);
 
       const { data: leadsData, error: leadsError } = await query;
 
@@ -141,6 +146,87 @@ const Leads = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleBulkStatusChange = async (newStatus: string) => {
+    if (selectedLeads.length === 0) return;
+    
+    try {
+      const { error } = await supabase
+        .from("leads")
+        .update({ status: newStatus })
+        .in("id", selectedLeads);
+
+      if (error) throw error;
+
+      toast({
+        title: "Status atualizado!",
+        description: `${selectedLeads.length} lead(s) atualizado(s) para ${newStatus}.`,
+      });
+
+      setSelectedLeads([]);
+      fetchData();
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedLeads.length === 0) return;
+    if (!confirm(`Tem certeza que deseja excluir ${selectedLeads.length} lead(s)?`)) return;
+    
+    try {
+      const { error } = await supabase
+        .from("leads")
+        .delete()
+        .in("id", selectedLeads);
+
+      if (error) throw error;
+
+      toast({
+        title: "Leads excluídos!",
+        description: `${selectedLeads.length} lead(s) foram removidos.`,
+      });
+
+      setSelectedLeads([]);
+      fetchData();
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const toggleLeadSelection = (leadId: string) => {
+    setSelectedLeads(prev => 
+      prev.includes(leadId) 
+        ? prev.filter(id => id !== leadId)
+        : [...prev, leadId]
+    );
+  };
+
+  const toggleAllLeads = () => {
+    if (selectedLeads.length === leads.length) {
+      setSelectedLeads([]);
+    } else {
+      setSelectedLeads(leads.map(lead => lead.id));
+    }
+  };
+
+  const isLeadNew = (dataCriacao: string) => {
+    const oneDayAgo = new Date();
+    oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+    return new Date(dataCriacao) > oneDayAgo;
+  };
+
+  const isLeadHot = (lead: Lead) => {
+    return lead.telefone && lead.interesse;
   };
 
   if (loading) {
@@ -271,23 +357,180 @@ const Leads = () => {
         </div>
       </div>
 
-      {/* Filtros */}
-      <FiltrosLeads
-        clientes={clientes}
-        filtros={filtros}
-        onFiltrosChange={setFiltros}
-        onAplicar={fetchData}
-        onLimpar={() => {
-          setFiltros({
-            origem: "all",
-            status: "all",
-            cliente_id: "all",
-            data_inicio: "",
-            data_fim: ""
-          });
-          fetchData();
-        }}
-      />
+      {/* Filtros Visíveis */}
+      <Card className="mb-6">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Filter className="h-5 w-5" />
+              Filtros
+            </CardTitle>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              {showFilters ? "Ocultar" : "Mostrar"}
+            </Button>
+          </div>
+        </CardHeader>
+        {showFilters && (
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-6">
+              <div className="space-y-2">
+                <Label>Buscar</Label>
+                <Input
+                  placeholder="Nome ou email..."
+                  value={filtros.busca}
+                  onChange={(e) => {
+                    setFiltros({ ...filtros, busca: e.target.value });
+                    fetchData();
+                  }}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Cliente</Label>
+                <Select value={filtros.cliente_id} onValueChange={(value) => setFiltros({ ...filtros, cliente_id: value })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Todos" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos</SelectItem>
+                    {clientes.map((cliente) => (
+                      <SelectItem key={cliente.id} value={cliente.id}>
+                        {cliente.nome}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Origem</Label>
+                <Select value={filtros.origem} onValueChange={(value) => setFiltros({ ...filtros, origem: value })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Todas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas</SelectItem>
+                    <SelectItem value="formulario">Formulário</SelectItem>
+                    <SelectItem value="manual">Manual</SelectItem>
+                    <SelectItem value="csv">CSV</SelectItem>
+                    <SelectItem value="n8n">N8N</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Status</Label>
+                <Select value={filtros.status} onValueChange={(value) => setFiltros({ ...filtros, status: value })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Todos" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos</SelectItem>
+                    <SelectItem value="novo">Novo</SelectItem>
+                    <SelectItem value="qualificado">Qualificado</SelectItem>
+                    <SelectItem value="convertido">Convertido</SelectItem>
+                    <SelectItem value="descartado">Descartado</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Data Início</Label>
+                <Input
+                  type="date"
+                  value={filtros.data_inicio}
+                  onChange={(e) => setFiltros({ ...filtros, data_inicio: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Data Fim</Label>
+                <Input
+                  type="date"
+                  value={filtros.data_fim}
+                  onChange={(e) => setFiltros({ ...filtros, data_fim: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-2 mt-4">
+              <Button onClick={fetchData} variant="outline">
+                Aplicar Filtros
+              </Button>
+              <Button onClick={() => {
+                setFiltros({
+                  origem: "all",
+                  status: "all",
+                  cliente_id: "all",
+                  data_inicio: "",
+                  data_fim: "",
+                  busca: ""
+                });
+                fetchData();
+              }} variant="ghost">
+                Limpar
+              </Button>
+            </div>
+          </CardContent>
+        )}
+      </Card>
+
+      {/* Ações em Massa */}
+      {selectedLeads.length > 0 && (
+        <Card className="mb-6 border-primary">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div className="text-sm font-medium">
+                {selectedLeads.length} lead(s) selecionado(s)
+              </div>
+              <div className="flex gap-2">
+                <Select onValueChange={handleBulkStatusChange}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Alterar status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="qualificado">Qualificado</SelectItem>
+                    <SelectItem value="convertido">Convertido</SelectItem>
+                    <SelectItem value="descartado">Descartado</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleBulkDelete}
+                >
+                  <Trash className="h-4 w-4 mr-2" />
+                  Excluir
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSelectedLeads([])}
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Seleção Total */}
+      {leads.length > 0 && (
+        <div className="flex items-center gap-2 mb-4">
+          <Checkbox
+            checked={selectedLeads.length === leads.length}
+            onCheckedChange={toggleAllLeads}
+          />
+          <span className="text-sm text-muted-foreground">
+            Selecionar todos ({leads.length})
+          </span>
+        </div>
+      )}
 
       {leads.length === 0 ? (
         <Card>
@@ -309,70 +552,101 @@ const Leads = () => {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-6">
-          {leads.map((lead) => (
-            <Card key={lead.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle className="text-xl">{lead.nome}</CardTitle>
-                    <CardDescription>
-                      Cliente: {lead.clientes?.nome}
-                    </CardDescription>
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {new Date(lead.data_criacao).toLocaleDateString('pt-BR')} às{' '}
-                    {new Date(lead.data_criacao).toLocaleTimeString('pt-BR', {
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </div>
-                </div>
-              </CardHeader>
-              
-              <CardContent>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="flex items-center gap-2">
-                    <Mail className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">{lead.email}</span>
-                  </div>
-                  
-                   {lead.telefone && (
-                     <div className="flex items-center gap-2">
-                       <Phone className="h-4 w-4 text-muted-foreground" />
-                       <span className="text-sm">{lead.telefone}</span>
-                     </div>
-                   )}
+        <div className="grid gap-4">
+          {leads.map((lead) => {
+            const isNew = isLeadNew(lead.data_criacao);
+            const isHot = isLeadHot(lead);
+            const isSelected = selectedLeads.includes(lead.id);
 
-                   <div className="flex items-center gap-2">
-                     <span className="text-xs px-2 py-1 bg-muted rounded-full">
-                       {lead.origem || 'formulario'}
-                     </span>
-                     <span className={`text-xs px-2 py-1 rounded-full ${
-                       lead.status === 'convertido' ? 'bg-green-100 text-green-800' :
-                       lead.status === 'qualificado' ? 'bg-blue-100 text-blue-800' :
-                       lead.status === 'descartado' ? 'bg-red-100 text-red-800' :
-                       'bg-gray-100 text-gray-800'
-                     }`}>
-                       {lead.status || 'novo'}
-                     </span>
-                   </div>
-                  
-                  {lead.interesse && (
-                    <div className="md:col-span-2 flex items-start gap-2">
-                      <MessageSquare className="h-4 w-4 text-muted-foreground mt-0.5" />
-                      <div>
-                        <span className="text-sm font-medium">Interesse:</span>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {lead.interesse}
-                        </p>
+            return (
+              <Card 
+                key={lead.id} 
+                className={`hover:shadow-lg transition-all hover-scale ${
+                  isHot ? 'border-orange-400 border-2' : ''
+                } ${isSelected ? 'ring-2 ring-primary' : ''}`}
+              >
+                <CardHeader>
+                  <div className="flex justify-between items-start gap-4">
+                    <div className="flex items-start gap-3 flex-1">
+                      <Checkbox
+                        checked={isSelected}
+                        onCheckedChange={() => toggleLeadSelection(lead.id)}
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <CardTitle className="text-xl">{lead.nome}</CardTitle>
+                          {isNew && (
+                            <Badge variant="secondary" className="text-xs flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              Novo
+                            </Badge>
+                          )}
+                          {isHot && (
+                            <Badge variant="destructive" className="text-xs flex items-center gap-1 bg-orange-500">
+                              <Flame className="h-3 w-3" />
+                              Quente
+                            </Badge>
+                          )}
+                        </div>
+                        <CardDescription>
+                          Cliente: {lead.clientes?.nome}
+                        </CardDescription>
                       </div>
                     </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                    <div className="text-sm text-muted-foreground text-right">
+                      {new Date(lead.data_criacao).toLocaleDateString('pt-BR')} às{' '}
+                      {new Date(lead.data_criacao).toLocaleTimeString('pt-BR', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </div>
+                  </div>
+                </CardHeader>
+                
+                <CardContent>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="flex items-center gap-2">
+                      <Mail className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">{lead.email}</span>
+                    </div>
+                    
+                     {lead.telefone && (
+                       <div className="flex items-center gap-2">
+                         <Phone className="h-4 w-4 text-muted-foreground" />
+                         <span className="text-sm">{lead.telefone}</span>
+                       </div>
+                     )}
+
+                     <div className="flex items-center gap-2 flex-wrap">
+                       <Badge variant="outline" className="text-xs">
+                         {lead.origem || 'formulario'}
+                       </Badge>
+                       <Badge className={`text-xs ${
+                         lead.status === 'convertido' ? 'bg-green-500' :
+                         lead.status === 'qualificado' ? 'bg-blue-500' :
+                         lead.status === 'descartado' ? 'bg-red-500' :
+                         'bg-gray-500'
+                       }`}>
+                         {lead.status || 'novo'}
+                       </Badge>
+                     </div>
+                    
+                    {lead.interesse && (
+                      <div className="md:col-span-2 flex items-start gap-2">
+                        <MessageSquare className="h-4 w-4 text-muted-foreground mt-0.5" />
+                        <div className="flex-1">
+                          <span className="text-sm font-medium">Interesse:</span>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {lead.interesse}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
       </div>

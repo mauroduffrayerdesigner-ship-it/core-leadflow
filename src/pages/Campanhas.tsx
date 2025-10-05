@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Edit, Trash2, Target, Eye, Pause, Play } from "lucide-react";
+import { Plus, Edit, Trash2, Target, Eye, Pause, Play, Users, TrendingUp, MoreVertical, ExternalLink } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import Layout from "@/components/Layout";
 import { useNavigate } from "react-router-dom";
@@ -22,8 +23,15 @@ interface Campanha {
   criado_em: string;
 }
 
+interface CampanhaMetrics {
+  total_leads: number;
+  taxa_conversao: number;
+  ultimo_lead: string | null;
+}
+
 const Campanhas = () => {
   const [campanhas, setCampanhas] = useState<Campanha[]>([]);
+  const [metrics, setMetrics] = useState<Record<string, CampanhaMetrics>>({});
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCampanha, setEditingCampanha] = useState<Campanha | null>(null);
@@ -62,6 +70,43 @@ const Campanhas = () => {
 
         if (error) throw error;
         setCampanhas(data || []);
+
+        // Buscar métricas para cada campanha
+        if (data) {
+          const metricsData: Record<string, CampanhaMetrics> = {};
+          
+          for (const campanha of data) {
+            // Total de leads
+            const { count: totalLeads } = await supabase
+              .from("leads")
+              .select("*", { count: "exact", head: true })
+              .eq("campanha_id", campanha.id);
+
+            // Leads convertidos
+            const { count: convertidos } = await supabase
+              .from("leads")
+              .select("*", { count: "exact", head: true })
+              .eq("campanha_id", campanha.id)
+              .eq("status", "convertido");
+
+            // Último lead
+            const { data: ultimoLead } = await supabase
+              .from("leads")
+              .select("data_criacao")
+              .eq("campanha_id", campanha.id)
+              .order("data_criacao", { ascending: false })
+              .limit(1)
+              .single();
+
+            metricsData[campanha.id] = {
+              total_leads: totalLeads || 0,
+              taxa_conversao: totalLeads && totalLeads > 0 ? ((convertidos || 0) / totalLeads) * 100 : 0,
+              ultimo_lead: ultimoLead?.data_criacao || null,
+            };
+          }
+          
+          setMetrics(metricsData);
+        }
       }
     } catch (error: any) {
       toast({
@@ -297,68 +342,109 @@ const Campanhas = () => {
           </Card>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {campanhas.map((campanha) => (
-              <Card key={campanha.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <CardTitle className="text-lg">{campanha.nome}</CardTitle>
-                        {getStatusBadge(campanha.status)}
+            {campanhas.map((campanha) => {
+              const campanhaMetrics = metrics[campanha.id];
+              
+              return (
+                <Card key={campanha.id} className="hover:shadow-lg transition-all hover-scale">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <CardTitle className="text-lg">{campanha.nome}</CardTitle>
+                          {getStatusBadge(campanha.status)}
+                        </div>
+                        {campanha.descricao && (
+                          <CardDescription className="line-clamp-2">
+                            {campanha.descricao}
+                          </CardDescription>
+                        )}
                       </div>
-                      {campanha.descricao && (
-                        <CardDescription className="line-clamp-2">
-                          {campanha.descricao}
-                        </CardDescription>
-                      )}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuItem onClick={() => navigate(`/campanha/${campanha.id}`)}>
+                            <Eye className="h-4 w-4 mr-2" />
+                            Gerenciar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => window.open(`/landing/${campanha.id}`, '_blank')}>
+                            <ExternalLink className="h-4 w-4 mr-2" />
+                            Ver Landing Page
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEdit(campanha)}>
+                            <Edit className="h-4 w-4 mr-2" />
+                            Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleToggleStatus(campanha)}>
+                            {campanha.status === 'ativa' ? (
+                              <><Pause className="h-4 w-4 mr-2" />Pausar</>
+                            ) : (
+                              <><Play className="h-4 w-4 mr-2" />Ativar</>
+                            )}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => handleDelete(campanha.id)}
+                            className="text-destructive focus:text-destructive"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Excluir
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
-                  </div>
-                </CardHeader>
-                
-                <CardContent className="space-y-3">
-                  <div className="text-sm text-muted-foreground">
-                    Criada em {new Date(campanha.criado_em).toLocaleDateString('pt-BR')}
-                  </div>
+                  </CardHeader>
                   
-                  <div className="flex gap-2">
+                  <CardContent className="space-y-4">
+                    {/* Métricas Resumidas */}
+                    {campanhaMetrics && (
+                      <div className="grid grid-cols-2 gap-3 p-3 bg-muted/50 rounded-lg">
+                        <div>
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
+                            <Users className="h-3 w-3" />
+                            Total Leads
+                          </div>
+                          <div className="text-xl font-bold">{campanhaMetrics.total_leads}</div>
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
+                            <TrendingUp className="h-3 w-3" />
+                            Conversão
+                          </div>
+                          <div className="text-xl font-bold">
+                            {campanhaMetrics.taxa_conversao.toFixed(1)}%
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Último Lead */}
+                    {campanhaMetrics?.ultimo_lead && (
+                      <div className="text-xs text-muted-foreground">
+                        Último lead: {new Date(campanhaMetrics.ultimo_lead).toLocaleDateString('pt-BR')}
+                      </div>
+                    )}
+                    
+                    <div className="text-sm text-muted-foreground">
+                      Criada em {new Date(campanha.criado_em).toLocaleDateString('pt-BR')}
+                    </div>
+                    
                     <Button 
-                      variant="outline" 
+                      variant="default" 
                       size="sm" 
-                      className="flex-1"
+                      className="w-full"
                       onClick={() => navigate(`/campanha/${campanha.id}`)}
                     >
                       <Eye className="h-4 w-4 mr-2" />
-                      Gerenciar
+                      Gerenciar Campanha
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleToggleStatus(campanha)}
-                    >
-                      {campanha.status === 'ativa' ? (
-                        <Pause className="h-4 w-4" />
-                      ) : (
-                        <Play className="h-4 w-4" />
-                      )}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEdit(campanha)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDelete(campanha.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>
