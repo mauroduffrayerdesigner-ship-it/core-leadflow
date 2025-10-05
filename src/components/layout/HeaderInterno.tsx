@@ -48,7 +48,7 @@ export const HeaderInterno = () => {
             Leads
           </Link>
           <Link to="/captura" className="text-muted-foreground hover:text-foreground transition-colors">
-            Captura
+            Landing Pages
           </Link>
         </nav>
 

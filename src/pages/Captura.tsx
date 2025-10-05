@@ -32,6 +32,13 @@ const Captura = () => {
     fetchClientes();
   }, []);
 
+  // Auto-selecionar cliente se houver apenas 1
+  useEffect(() => {
+    if (clientes.length === 1 && !selectedCliente) {
+      setSelectedCliente(clientes[0].id);
+    }
+  }, [clientes, selectedCliente]);
+
   const fetchClientes = async () => {
     try {
       const { data, error } = await supabase
@@ -148,9 +155,9 @@ const Captura = () => {
       <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">Formulário de Captura</h1>
+          <h1 className="text-3xl font-bold mb-2">Landing Pages</h1>
           <p className="text-muted-foreground">
-            Crie e compartilhe formulários personalizados para capturar leads
+            Crie e compartilhe landing pages personalizadas para capturar leads
           </p>
         </div>
 

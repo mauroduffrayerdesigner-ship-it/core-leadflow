@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building, Users, Share2, BookOpen, BarChart3, TrendingUp, Globe } from "lucide-react";
+import { Building, Users, Share2, BookOpen, BarChart3, TrendingUp, Globe, Filter } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Layout from "@/components/Layout";
 import MetricasAvancadas from "@/components/dashboard/MetricasAvancadas";
 import { StatCard } from "@/components/dashboard/StatCard";
@@ -11,34 +12,83 @@ import { QuickActions } from "@/components/dashboard/QuickActions";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
 
 const Dashboard = () => {
+  const [selectedCampanha, setSelectedCampanha] = useState<string>("todas");
+  const [campanhas, setCampanhas] = useState<Array<{ id: string; nome: string }>>([]);
   const [stats, setStats] = useState({
     totalLeads: 0,
     leadsEsteMs: 0,
+    leadsEsteMesAnterior: 0,
     totalClientes: 0,
     landingPagesAtivas: 0,
     taxaConversaoMedia: 0,
   });
 
   useEffect(() => {
-    fetchStats();
+    fetchCampanhas();
   }, []);
+
+  useEffect(() => {
+    fetchStats();
+  }, [selectedCampanha]);
+
+  const fetchCampanhas = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("campanhas")
+        .select("id, nome")
+        .order("nome");
+
+      if (error) throw error;
+      setCampanhas(data || []);
+    } catch (error: any) {
+      console.error("Erro ao buscar campanhas:", error);
+    }
+  };
 
   const fetchStats = async () => {
     try {
-      // Total de leads
-      const { count: totalLeads } = await supabase
-        .from("leads")
-        .select("*", { count: "exact", head: true });
+      // Filtro de campanha
+      const campanhaFilter = selectedCampanha !== "todas" ? selectedCampanha : null;
+
+      // Total de leads (filtrado por campanha se selecionada)
+      let leadsQuery = supabase.from("leads").select("*", { count: "exact", head: true });
+      if (campanhaFilter) {
+        leadsQuery = leadsQuery.eq("campanha_id", campanhaFilter);
+      }
+      const { count: totalLeads } = await leadsQuery;
 
       // Leads este mês
       const inicioMes = new Date();
       inicioMes.setDate(1);
       inicioMes.setHours(0, 0, 0, 0);
 
-      const { count: leadsEsteMs } = await supabase
+      let leadsEsteMsQuery = supabase
         .from("leads")
         .select("*", { count: "exact", head: true })
         .gte("data_criacao", inicioMes.toISOString());
+      if (campanhaFilter) {
+        leadsEsteMsQuery = leadsEsteMsQuery.eq("campanha_id", campanhaFilter);
+      }
+      const { count: leadsEsteMs } = await leadsEsteMsQuery;
+
+      // Leads mês anterior (para comparação)
+      const inicioMesAnterior = new Date();
+      inicioMesAnterior.setMonth(inicioMesAnterior.getMonth() - 1);
+      inicioMesAnterior.setDate(1);
+      inicioMesAnterior.setHours(0, 0, 0, 0);
+
+      const fimMesAnterior = new Date(inicioMes);
+      fimMesAnterior.setMilliseconds(-1);
+
+      let leadsEsteMsAnteriorQuery = supabase
+        .from("leads")
+        .select("*", { count: "exact", head: true })
+        .gte("data_criacao", inicioMesAnterior.toISOString())
+        .lte("data_criacao", fimMesAnterior.toISOString());
+      if (campanhaFilter) {
+        leadsEsteMsAnteriorQuery = leadsEsteMsAnteriorQuery.eq("campanha_id", campanhaFilter);
+      }
+      const { count: leadsEsteMesAnterior } = await leadsEsteMsAnteriorQuery;
 
       // Total de campanhas ativas
       const { count: totalCampanhas } = await supabase
@@ -46,16 +96,20 @@ const Dashboard = () => {
         .select("*", { count: "exact", head: true })
         .eq("status", "ativa");
 
-      // Landing pages ativas (campanhas com tema configurado)
+      // Landing pages ativas
       const { count: landingPagesAtivas } = await supabase
         .from("campanhas")
         .select("*", { count: "exact", head: true })
         .not("tema_id", "is", null);
 
       // Calcular taxa de conversão média
-      const { data: metricas } = await supabase
+      let metricasQuery = supabase
         .from("metricas_campanha")
         .select("total_leads, leads_convertidos");
+      if (campanhaFilter) {
+        metricasQuery = metricasQuery.eq("campanha_id", campanhaFilter);
+      }
+      const { data: metricas } = await metricasQuery;
 
       let taxaConversaoMedia = 0;
       if (metricas && metricas.length > 0) {
@@ -67,6 +121,7 @@ const Dashboard = () => {
       setStats({
         totalLeads: totalLeads || 0,
         leadsEsteMs: leadsEsteMs || 0,
+        leadsEsteMesAnterior: leadsEsteMesAnterior || 0,
         totalClientes: totalCampanhas || 0,
         landingPagesAtivas: landingPagesAtivas || 0,
         taxaConversaoMedia,
@@ -79,19 +134,48 @@ const Dashboard = () => {
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8 space-y-8">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <div className="inline-block">
             <h1 className="text-5xl font-bold mb-4 gradient-bg-hero bg-clip-text text-transparent">
-              Dashboard CORE Capture
+              Dashboard de Marketing
             </h1>
           </div>
           <p className="text-xl text-muted-foreground mb-4">
-            Sistema completo para captura de leads com landing pages otimizadas
+            Plataforma completa para gestão de leads e automação de vendas
           </p>
           <Badge variant="secondary" className="text-sm px-4 py-2 animate-pulse-slow">
             🚀 Sistema Ativo
           </Badge>
         </div>
+
+        {/* Filtro de Campanha */}
+        <Card className="mb-6">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-4">
+              <Filter className="h-5 w-5 text-muted-foreground" />
+              <div className="flex-1">
+                <Select value={selectedCampanha} onValueChange={setSelectedCampanha}>
+                  <SelectTrigger className="w-full md:w-[300px]">
+                    <SelectValue placeholder="Filtrar por campanha" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todas">Todas as Campanhas</SelectItem>
+                    {campanhas.map((campanha) => (
+                      <SelectItem key={campanha.id} value={campanha.id}>
+                        {campanha.nome}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              {selectedCampanha !== "todas" && (
+                <Badge variant="secondary">
+                  Filtro ativo
+                </Badge>
+              )}
+            </div>
+          </CardContent>
+        </Card>
         
         {/* Cards de Métricas com Design Aprimorado */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
@@ -118,7 +202,12 @@ const Dashboard = () => {
             value={stats.leadsEsteMs}
             description={`Novos leads em ${new Date().toLocaleDateString('pt-BR', { month: 'long' })}`}
             icon={<TrendingUp className="h-4 w-4" />}
-            trend={{ value: 8, label: "vs mês anterior" }}
+            trend={{ 
+              value: stats.leadsEsteMesAnterior > 0 
+                ? Math.round(((stats.leadsEsteMs - stats.leadsEsteMesAnterior) / stats.leadsEsteMesAnterior) * 100)
+                : 0, 
+              label: "vs mês anterior" 
+            }}
             className="shadow-brand-accent"
           />
 
