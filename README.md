@@ -1,73 +1,230 @@
-# Welcome to your Lovable project
+# 🚀 Plataforma de Marketing e Vendas - Geração e Gestão de Leads
 
-## Project info
+![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Supabase](https://img.shields.io/badge/Supabase-Ready-green.svg)
 
-**URL**: https://lovable.dev/projects/8f02ea60-2f8e-4fa7-b72c-e71477177968
+> Sistema completo de marketing digital para captura, gestão e nutrição de leads com landing pages personalizadas, automação de emails e integrações via webhook.
 
-## How can I edit this code?
+## ✨ Principais Funcionalidades
 
-There are several ways of editing your application.
+- 📊 **Dashboard Inteligente** - Métricas em tempo real com filtros por campanha
+- 🎨 **Landing Pages Personalizadas** - 6 temas profissionais prontos para uso
+- 📧 **Email Marketing Automático** - Templates personalizáveis com assinaturas
+- 🎯 **Gestão Avançada de Leads** - Importação CSV, filtros, exportação e bulk actions
+- 🔗 **Webhooks & Integrações** - Conecte com N8N, Make, Zapier e qualquer sistema
+- 📈 **Métricas Detalhadas** - Acompanhe conversões, origens e performance
+- 🌐 **Domínios Customizados** - Configure seus próprios domínios por campanha
+- 📱 **100% Responsivo** - Perfeito em desktop, tablet e mobile
 
-**Use Lovable**
+## 🛠️ Stack Tecnológica
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/8f02ea60-2f8e-4fa7-b72c-e71477177968) and start prompting.
+### Frontend
+- **React 18** - Biblioteca UI moderna
+- **TypeScript** - Tipagem estática
+- **Vite** - Build tool ultra-rápido
+- **Tailwind CSS** - Utility-first CSS
+- **shadcn/ui** - Componentes acessíveis
+- **React Query** - Gerenciamento de estado servidor
+- **React Hook Form** - Formulários performáticos
+- **Zod** - Validação de schemas
 
-Changes made via Lovable will be committed automatically to this repo.
+### Backend
+- **Supabase** - Backend-as-a-Service
+  - PostgreSQL - Banco de dados relacional
+  - Row Level Security (RLS) - Segurança nativa
+  - Edge Functions - Serverless em Deno
+  - Realtime - Atualizações ao vivo
+  - Auth - Autenticação integrada
 
-**Use your preferred IDE**
+### Integrações
+- **Brevo (Sendinblue)** - Envio de emails transacionais
+- **Webhooks** - Integração com automações externas
+- **QR Code** - Geração de códigos para compartilhamento
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 📚 Documentação
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+| Documento | Descrição |
+|-----------|-----------|
+| [**Manual do Usuário**](./MANUAL-USUARIO.md) | Guia completo para usuários finais |
+| [**Manual de Deploy**](./MANUAL-DEPLOY.md) | Guia técnico para desenvolvedores |
+| [**Arquitetura**](./ARQUITETURA.md) | Documentação técnica da arquitetura |
+| [**API Reference**](./API-REFERENCE.md) | Referência de APIs e webhooks |
+| [**Troubleshooting**](./TROUBLESHOOTING.md) | Solução de problemas comuns |
+| [**Changelog**](./CHANGELOG.md) | Histórico de versões |
 
-Follow these steps:
+## 🚀 Quick Start
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+### Pré-requisitos
+
+- Node.js 18+ 
+- npm ou yarn
+- Conta Supabase (gratuita)
+- Conta Brevo para emails (gratuita)
+
+### Instalação Local
+
+```bash
+# 1. Clone o repositório
 git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
-npm i
+# 2. Instale as dependências
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# 3. Configure o ambiente
+# As configurações do Supabase já estão no código
+# Você só precisa configurar os secrets no Supabase Dashboard
+
+# 4. Inicie o servidor de desenvolvimento
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Acesse: `http://localhost:5173`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Configuração Rápida
 
-**Use GitHub Codespaces**
+1. **Crie sua conta** - Acesse a aplicação e faça o cadastro
+2. **Configure o Brevo** - Adicione sua chave API no Supabase Dashboard
+3. **Crie sua primeira campanha** - Siga o wizard de onboarding
+4. **Compartilhe sua landing page** - Use o link ou QR Code gerado
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🎯 Casos de Uso
 
-## What technologies are used for this project?
+### Para Agências de Marketing
+- Gerencie múltiplos clientes e campanhas
+- Landing pages white-label com domínio personalizado
+- Relatórios detalhados por cliente
+- Integrações com ferramentas de automação
 
-This project is built with:
+### Para PMEs e Freelancers
+- Capture leads para seu negócio
+- Nutrição automática por email
+- Métricas simples e claras
+- Setup em minutos
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Para Desenvolvedores
+- API aberta para integrações
+- Webhooks configuráveis
+- Edge Functions customizáveis
+- Schema do banco totalmente documentado
 
-## How can I deploy this project?
+## 📊 Estrutura do Projeto
 
-Simply open [Lovable](https://lovable.dev/projects/8f02ea60-2f8e-4fa7-b72c-e71477177968) and click on Share -> Publish.
+```
+├── src/
+│   ├── components/      # Componentes React reutilizáveis
+│   │   ├── ui/         # Componentes base (shadcn)
+│   │   ├── dashboard/  # Componentes do dashboard
+│   │   ├── campanha/   # Componentes de campanhas
+│   │   ├── leads/      # Componentes de leads
+│   │   ├── landing/    # Componentes de landing pages
+│   │   └── layout/     # Layout e navegação
+│   ├── pages/          # Páginas da aplicação
+│   ├── hooks/          # Custom React hooks
+│   ├── lib/            # Utilitários
+│   └── integrations/   # Integrações (Supabase)
+├── supabase/
+│   ├── functions/      # Edge Functions (Deno)
+│   └── migrations/     # Migrations do banco
+├── public/             # Assets estáticos
+└── docs/              # Documentação adicional
+```
 
-## Can I connect a custom domain to my Lovable project?
+## 🔐 Segurança
 
-Yes, you can!
+- ✅ Row Level Security (RLS) em todas as tabelas
+- ✅ Autenticação via Supabase Auth
+- ✅ Validação de schemas com Zod
+- ✅ CORS configurado corretamente
+- ✅ Secrets gerenciados pelo Supabase
+- ✅ Edge Functions isoladas
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 🌟 Features Destacadas
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+### Onboarding Inteligente
+Wizard passo-a-passo que guia novos usuários:
+1. Criar primeiro cliente
+2. Configurar campanha
+3. Personalizar landing page
+4. Começar a capturar leads
+
+### Dashboard Analytics
+- Total de leads capturados
+- Taxa de conversão
+- Leads por origem (formulário, CSV, webhook, manual)
+- Comparativo mês atual vs anterior
+- Atividade recente em tempo real
+
+### Gestão de Leads
+- **Filtros avançados**: Status, origem, período, campanha
+- **Bulk actions**: Atualizar status em massa
+- **Importação CSV**: Template pré-formatado
+- **Exportação**: Dados completos em CSV
+- **Timeline**: Histórico de interações
+
+### Email Marketing
+- 4 temas de email profissionais
+- Variáveis dinâmicas (nome, email, telefone)
+- Assinaturas HTML personalizadas
+- Envio manual ou automático
+- Logs completos de envio
+
+### Landing Pages
+- 6 temas responsivos
+- Editor inline (headline, subtítulo, CTA)
+- Preview em tempo real
+- QR Code automático
+- URLs amigáveis (`/lp/[campanha_id]`)
+- Domínio personalizado opcional
+
+## 🔗 Integrações
+
+### N8N / Make / Zapier
+Configure webhooks para enviar leads capturados automaticamente para suas automações:
+
+```javascript
+// Payload enviado pelo webhook
+{
+  "nome": "João Silva",
+  "email": "joao@exemplo.com",
+  "telefone": "+5511999999999",
+  "interesse": "Consultoria",
+  "origem": "formulario",
+  "cliente_id": "uuid",
+  "campanha_id": "uuid"
+}
+```
+
+## 🤝 Contribuindo
+
+Contribuições são bem-vindas! Por favor:
+
+1. Fork o projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+## 📝 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+
+## 🆘 Suporte
+
+- 📖 [Documentação Completa](./MANUAL-USUARIO.md)
+- 🐛 [Report de Bugs](https://github.com/your-repo/issues)
+- 💬 [Discussões](https://github.com/your-repo/discussions)
+- 📧 Email: suporte@seudominio.com
+
+## 🎉 Créditos
+
+Desenvolvido com ❤️ usando:
+- [React](https://react.dev/)
+- [Supabase](https://supabase.com/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [shadcn/ui](https://ui.shadcn.com/)
+
+---
+
+**⭐ Se este projeto foi útil, considere dar uma estrela no GitHub!**
