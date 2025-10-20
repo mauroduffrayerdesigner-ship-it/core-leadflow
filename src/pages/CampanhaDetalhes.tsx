@@ -13,6 +13,7 @@ import ConfiguracoesCampanha from "@/components/campanha/ConfiguracoesCampanha";
 import LeadsCampanha from "@/components/campanha/LeadsCampanha";
 import MetricasCampanha from "@/components/campanha/MetricasCampanha";
 import EmailsCampanha from "@/components/campanha/EmailsCampanha";
+import { WhatsAppCampanha } from "@/components/campanha/WhatsAppCampanha";
 
 interface Campanha {
   id: string;
@@ -137,6 +138,7 @@ const CampanhaDetalhes = () => {
             <TabsTrigger value="leads">Leads</TabsTrigger>
             <TabsTrigger value="metricas">Métricas</TabsTrigger>
             <TabsTrigger value="emails">Emails</TabsTrigger>
+            <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
             <TabsTrigger value="configuracoes">Configurações</TabsTrigger>
           </TabsList>
 
@@ -154,6 +156,10 @@ const CampanhaDetalhes = () => {
 
           <TabsContent value="emails">
             <EmailsCampanha campanhaId={campanhaId!} />
+          </TabsContent>
+
+          <TabsContent value="whatsapp">
+            <WhatsAppCampanha campanhaId={campanhaId!} />
           </TabsContent>
 
           <TabsContent value="configuracoes">

@@ -690,6 +690,249 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_config: {
+        Row: {
+          access_token_secret: string | null
+          api_type: string
+          atualizado_em: string | null
+          auto_reply_enabled: boolean | null
+          campanha_id: string | null
+          chatwoot_account_id: string | null
+          chatwoot_api_key_secret: string | null
+          chatwoot_inbox_id: string | null
+          chatwoot_url: string | null
+          cliente_id: string | null
+          criado_em: string | null
+          id: string
+          last_connection: string | null
+          phone_number_id: string | null
+          qr_code: string | null
+          status: string | null
+          template_followup: string | null
+          template_saudacao: string | null
+          venom_session_name: string | null
+          venom_webhook_url: string | null
+          webhook_verify_token: string | null
+          whatsapp_business_account_id: string | null
+        }
+        Insert: {
+          access_token_secret?: string | null
+          api_type: string
+          atualizado_em?: string | null
+          auto_reply_enabled?: boolean | null
+          campanha_id?: string | null
+          chatwoot_account_id?: string | null
+          chatwoot_api_key_secret?: string | null
+          chatwoot_inbox_id?: string | null
+          chatwoot_url?: string | null
+          cliente_id?: string | null
+          criado_em?: string | null
+          id?: string
+          last_connection?: string | null
+          phone_number_id?: string | null
+          qr_code?: string | null
+          status?: string | null
+          template_followup?: string | null
+          template_saudacao?: string | null
+          venom_session_name?: string | null
+          venom_webhook_url?: string | null
+          webhook_verify_token?: string | null
+          whatsapp_business_account_id?: string | null
+        }
+        Update: {
+          access_token_secret?: string | null
+          api_type?: string
+          atualizado_em?: string | null
+          auto_reply_enabled?: boolean | null
+          campanha_id?: string | null
+          chatwoot_account_id?: string | null
+          chatwoot_api_key_secret?: string | null
+          chatwoot_inbox_id?: string | null
+          chatwoot_url?: string | null
+          cliente_id?: string | null
+          criado_em?: string | null
+          id?: string
+          last_connection?: string | null
+          phone_number_id?: string | null
+          qr_code?: string | null
+          status?: string | null
+          template_followup?: string | null
+          template_saudacao?: string | null
+          venom_session_name?: string | null
+          venom_webhook_url?: string | null
+          webhook_verify_token?: string | null
+          whatsapp_business_account_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_config_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
+            referencedRelation: "campanhas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whatsapp_config_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
+            referencedRelation: "landing_page_campanha_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whatsapp_config_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whatsapp_config_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "landing_page_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      whatsapp_messages: {
+        Row: {
+          campanha_id: string | null
+          content: string | null
+          criado_em: string | null
+          direction: string | null
+          error_message: string | null
+          from_number: string | null
+          id: string
+          lead_id: string | null
+          media_url: string | null
+          status: string | null
+          timestamp: string | null
+          to_number: string | null
+          type: string | null
+          whatsapp_id: string | null
+        }
+        Insert: {
+          campanha_id?: string | null
+          content?: string | null
+          criado_em?: string | null
+          direction?: string | null
+          error_message?: string | null
+          from_number?: string | null
+          id?: string
+          lead_id?: string | null
+          media_url?: string | null
+          status?: string | null
+          timestamp?: string | null
+          to_number?: string | null
+          type?: string | null
+          whatsapp_id?: string | null
+        }
+        Update: {
+          campanha_id?: string | null
+          content?: string | null
+          criado_em?: string | null
+          direction?: string | null
+          error_message?: string | null
+          from_number?: string | null
+          id?: string
+          lead_id?: string | null
+          media_url?: string | null
+          status?: string | null
+          timestamp?: string | null
+          to_number?: string | null
+          type?: string | null
+          whatsapp_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_messages_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
+            referencedRelation: "campanhas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whatsapp_messages_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
+            referencedRelation: "landing_page_campanha_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whatsapp_messages_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      whatsapp_templates: {
+        Row: {
+          approval_status: string | null
+          ativo: boolean | null
+          body_content: string
+          campanha_id: string | null
+          category: string | null
+          criado_em: string | null
+          footer_content: string | null
+          header_content: string | null
+          header_type: string | null
+          id: string
+          language: string | null
+          name: string
+          variables: Json | null
+          whatsapp_template_id: string | null
+        }
+        Insert: {
+          approval_status?: string | null
+          ativo?: boolean | null
+          body_content: string
+          campanha_id?: string | null
+          category?: string | null
+          criado_em?: string | null
+          footer_content?: string | null
+          header_content?: string | null
+          header_type?: string | null
+          id?: string
+          language?: string | null
+          name: string
+          variables?: Json | null
+          whatsapp_template_id?: string | null
+        }
+        Update: {
+          approval_status?: string | null
+          ativo?: boolean | null
+          body_content?: string
+          campanha_id?: string | null
+          category?: string | null
+          criado_em?: string | null
+          footer_content?: string | null
+          header_content?: string | null
+          header_type?: string | null
+          id?: string
+          language?: string | null
+          name?: string
+          variables?: Json | null
+          whatsapp_template_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_templates_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
+            referencedRelation: "campanhas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whatsapp_templates_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
+            referencedRelation: "landing_page_campanha_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       landing_page_campanha_public: {
