@@ -794,17 +794,94 @@ export type Database = {
           },
         ]
       }
+      whatsapp_conversations: {
+        Row: {
+          assigned_to: string | null
+          atualizado_em: string | null
+          campanha_id: string | null
+          criado_em: string | null
+          id: string
+          last_message_at: string | null
+          last_message_content: string | null
+          last_message_direction: string | null
+          lead_id: string | null
+          notes: string | null
+          status: string | null
+          tags: string[] | null
+          total_messages: number | null
+          unread_count: number | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          atualizado_em?: string | null
+          campanha_id?: string | null
+          criado_em?: string | null
+          id?: string
+          last_message_at?: string | null
+          last_message_content?: string | null
+          last_message_direction?: string | null
+          lead_id?: string | null
+          notes?: string | null
+          status?: string | null
+          tags?: string[] | null
+          total_messages?: number | null
+          unread_count?: number | null
+        }
+        Update: {
+          assigned_to?: string | null
+          atualizado_em?: string | null
+          campanha_id?: string | null
+          criado_em?: string | null
+          id?: string
+          last_message_at?: string | null
+          last_message_content?: string | null
+          last_message_direction?: string | null
+          lead_id?: string | null
+          notes?: string | null
+          status?: string | null
+          tags?: string[] | null
+          total_messages?: number | null
+          unread_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_conversations_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
+            referencedRelation: "campanhas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whatsapp_conversations_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
+            referencedRelation: "landing_page_campanha_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whatsapp_conversations_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       whatsapp_messages: {
         Row: {
           campanha_id: string | null
           content: string | null
+          conversation_id: string | null
           criado_em: string | null
+          delivered_at: string | null
           direction: string | null
           error_message: string | null
           from_number: string | null
           id: string
           lead_id: string | null
           media_url: string | null
+          metadata: Json | null
+          read_at: string | null
           status: string | null
           timestamp: string | null
           to_number: string | null
@@ -814,13 +891,17 @@ export type Database = {
         Insert: {
           campanha_id?: string | null
           content?: string | null
+          conversation_id?: string | null
           criado_em?: string | null
+          delivered_at?: string | null
           direction?: string | null
           error_message?: string | null
           from_number?: string | null
           id?: string
           lead_id?: string | null
           media_url?: string | null
+          metadata?: Json | null
+          read_at?: string | null
           status?: string | null
           timestamp?: string | null
           to_number?: string | null
@@ -830,13 +911,17 @@ export type Database = {
         Update: {
           campanha_id?: string | null
           content?: string | null
+          conversation_id?: string | null
           criado_em?: string | null
+          delivered_at?: string | null
           direction?: string | null
           error_message?: string | null
           from_number?: string | null
           id?: string
           lead_id?: string | null
           media_url?: string | null
+          metadata?: Json | null
+          read_at?: string | null
           status?: string | null
           timestamp?: string | null
           to_number?: string | null
@@ -856,6 +941,13 @@ export type Database = {
             columns: ["campanha_id"]
             isOneToOne: false
             referencedRelation: "landing_page_campanha_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whatsapp_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "whatsapp_conversations"
             referencedColumns: ["id"]
           },
           {

@@ -47,6 +47,9 @@ export const HeaderInterno = () => {
           <Link to="/leads" className="text-muted-foreground hover:text-foreground transition-colors">
             Leads
           </Link>
+          <Link to="/whatsapp" className="text-muted-foreground hover:text-foreground transition-colors">
+            WhatsApp
+          </Link>
           <Link to="/captura" className="text-muted-foreground hover:text-foreground transition-colors">
             Landing Pages
           </Link>

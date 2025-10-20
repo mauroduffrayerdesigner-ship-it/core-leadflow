@@ -11,6 +11,7 @@ import CampanhaDetalhes from "./pages/CampanhaDetalhes";
 import Leads from "./pages/Leads";
 import Captura from "./pages/Captura";
 import LandingPage from "./pages/LandingPage";
+import WhatsApp from "./pages/WhatsApp";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,8 @@ const App = () => (
           <Route path="/campanha/:campanhaId" element={<CampanhaDetalhes />} />
           <Route path="/leads" element={<Leads />} />
           <Route path="/captura" element={<Captura />} />
+          <Route path="/whatsapp" element={<WhatsApp />} />
+          <Route path="/whatsapp/:campanhaId" element={<WhatsApp />} />
           <Route path="/lp/:campanhaId" element={<LandingPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
