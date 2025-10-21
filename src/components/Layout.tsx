@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
-import { LogOut, Building, Users, Share2, BarChart3 } from "lucide-react";
+import { LogOut, Building, Users, Share2, BarChart3, MessageSquare } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface LayoutProps {
@@ -62,6 +62,7 @@ const Layout = ({ children }: LayoutProps) => {
     { path: "/campanhas", label: "Campanhas", icon: Building },
     { path: "/leads", label: "Leads", icon: Users },
     { path: "/captura", label: "Captura", icon: Share2 },
+    { path: "/whatsapp", label: "WhatsApp", icon: MessageSquare },
   ];
 
   if (loading) {

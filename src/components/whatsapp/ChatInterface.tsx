@@ -163,28 +163,38 @@ const ChatInterface = ({ conversationId }: ChatInterfaceProps) => {
 
     setSending(true);
     try {
-      const { error } = await supabase.from("whatsapp_messages").insert({
-        conversation_id: conversationId,
-        content: messageText,
-        direction: "outbound",
-        type: "text",
-        status: "pending",
+      // Buscar campanha_id da conversa
+      const { data: conv, error: convError } = await supabase
+        .from("whatsapp_conversations")
+        .select("campanha_id, lead_id")
+        .eq("id", conversationId)
+        .single();
+
+      if (convError || !conv) {
+        console.error("Conversa não encontrada:", convError);
+        toast.error("Conversa não encontrada");
+        return;
+      }
+
+      // Enviar via Edge Function
+      const { data, error } = await supabase.functions.invoke('whatsapp-send-message', {
+        body: {
+          campanhaId: conv.campanha_id,
+          leadId: conv.lead_id,
+          conversationId: conversationId,
+          message: messageText,
+          type: 'text',
+        }
       });
 
       if (error) throw error;
 
-      // Atualizar última mensagem na conversa
-      await supabase
-        .from("whatsapp_conversations")
-        .update({
-          last_message_at: new Date().toISOString(),
-          last_message_content: messageText,
-          last_message_direction: "outbound",
-        })
-        .eq("id", conversationId);
-
-      setMessageText("");
-      toast.success("Mensagem enviada");
+      if (data.success) {
+        setMessageText("");
+        toast.success("Mensagem enviada");
+      } else {
+        throw new Error(data.error || 'Falha ao enviar mensagem');
+      }
     } catch (error: any) {
       console.error("Erro ao enviar mensagem:", error);
       toast.error("Erro ao enviar mensagem");

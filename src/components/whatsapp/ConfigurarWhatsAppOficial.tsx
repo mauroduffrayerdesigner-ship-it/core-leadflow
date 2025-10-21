@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, CheckCircle2, XCircle } from "lucide-react";
+import { ExternalLink, CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { whatsappOfficialConfigSchema } from "@/lib/validations/whatsapp";
 
 interface ConfigurarWhatsAppOficialProps {
   campanhaId: string;
@@ -27,6 +28,9 @@ export const ConfigurarWhatsAppOficial = ({ campanhaId, config, onUpdate }: Conf
   const handleSave = async () => {
     setLoading(true);
     try {
+      // Validar com Zod
+      const validatedData = whatsappOfficialConfigSchema.parse(formData);
+      
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Usuário não autenticado");
 
@@ -40,18 +44,22 @@ export const ConfigurarWhatsAppOficial = ({ campanhaId, config, onUpdate }: Conf
         campanha_id: campanhaId,
         cliente_id: cliente?.id,
         api_type: "official" as const,
-        ...formData,
+        ...validatedData,
       };
 
       if (config?.id) {
-        await supabase
+        const { error } = await supabase
           .from("whatsapp_config")
           .update(configData)
           .eq("id", config.id);
+        
+        if (error) throw error;
       } else {
-        await supabase
+        const { error } = await supabase
           .from("whatsapp_config")
           .insert(configData);
+        
+        if (error) throw error;
       }
 
       toast({
@@ -63,7 +71,7 @@ export const ConfigurarWhatsAppOficial = ({ campanhaId, config, onUpdate }: Conf
     } catch (error: any) {
       toast({
         title: "Erro ao salvar",
-        description: error.message,
+        description: error.issues?.[0]?.message || error.message,
         variant: "destructive",
       });
     } finally {
@@ -71,11 +79,38 @@ export const ConfigurarWhatsAppOficial = ({ campanhaId, config, onUpdate }: Conf
     }
   };
 
+  const [testing, setTesting] = useState(false);
+
   const handleTestConnection = async () => {
-    toast({
-      title: "Testando conexão",
-      description: "Verificando credenciais da API...",
-    });
+    setTesting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('whatsapp-test-connection', {
+        body: { campanhaId }
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        toast({
+          title: "Conexão estabelecida",
+          description: data.message || "Credenciais válidas!",
+        });
+      } else {
+        toast({
+          title: "Falha na conexão",
+          description: data.error || "Verifique suas credenciais",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Erro ao testar",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setTesting(false);
+    }
   };
 
   return (
@@ -155,9 +190,11 @@ export const ConfigurarWhatsAppOficial = ({ campanhaId, config, onUpdate }: Conf
 
         <div className="flex gap-2">
           <Button onClick={handleSave} disabled={loading}>
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Salvar Configurações
           </Button>
-          <Button variant="outline" onClick={handleTestConnection} disabled={!config?.id}>
+          <Button variant="outline" onClick={handleTestConnection} disabled={!config?.id || testing}>
+            {testing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Testar Conexão
           </Button>
         </div>

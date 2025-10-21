@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MessageCircle } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface HistoricoWhatsAppProps {
   campanhaId: string;
@@ -30,7 +31,8 @@ export const HistoricoWhatsApp = ({ campanhaId }: HistoricoWhatsAppProps) => {
           leads (nome, telefone, email)
         `)
         .eq("campanha_id", campanhaId)
-        .order("criado_em", { ascending: false });
+        .order("criado_em", { ascending: false })
+        .range(0, 99); // Paginação: primeiros 100
 
       if (error) throw error;
       setMessages(data || []);
@@ -106,7 +108,13 @@ export const HistoricoWhatsApp = ({ campanhaId }: HistoricoWhatsAppProps) => {
         </div>
 
         {loading ? (
-          <p>Carregando...</p>
+          <div className="space-y-2">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+          </div>
         ) : filteredMessages.length === 0 ? (
           <p className="text-center text-muted-foreground py-8">
             Nenhuma mensagem encontrada

@@ -27,6 +27,17 @@ const MessageBubble = ({ message }: MessageBubbleProps) => {
     }
   };
 
+  const escapeHtml = (text: string) => {
+    const map: Record<string, string> = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;',
+    };
+    return text.replace(/[&<>"']/g, (m) => map[m]);
+  };
+
   const getStatusIcon = () => {
     if (message.read_at) {
       return <CheckCheck className="h-3 w-3 text-blue-500" />;
@@ -57,7 +68,7 @@ const MessageBubble = ({ message }: MessageBubbleProps) => {
           />
         )}
         
-        <p className="whitespace-pre-wrap break-words">{message.content}</p>
+        <p className="whitespace-pre-wrap break-words">{escapeHtml(message.content)}</p>
         
         <div className={`flex items-center justify-end gap-1 mt-1 text-xs ${
           isOutbound ? "text-primary-foreground/70" : "text-muted-foreground"

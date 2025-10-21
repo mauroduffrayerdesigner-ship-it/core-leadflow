@@ -6,7 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Send } from "lucide-react";
+import { Send, Loader2 } from "lucide-react";
+import { sendBulkMessageSchema } from "@/lib/validations/whatsapp";
 
 interface EnviarMensagemWhatsAppProps {
   campanhaId: string;
@@ -66,28 +67,58 @@ export const EnviarMensagemWhatsApp = ({ campanhaId }: EnviarMensagemWhatsAppPro
   };
 
   const handleSend = async () => {
-    if (!selectedTemplate || selectedLeads.length === 0) {
-      toast({
-        title: "Erro",
-        description: "Selecione um template e ao menos um lead.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setLoading(true);
     try {
-      toast({
-        title: "Enviando mensagens",
-        description: `Enviando para ${selectedLeads.length} lead(s)...`,
+      // Validar entrada
+      const validatedData = sendBulkMessageSchema.parse({
+        templateId: selectedTemplate,
+        leadIds: selectedLeads,
       });
 
-      // Aqui será implementada a chamada para a edge function
-      // await supabase.functions.invoke('whatsapp-send', { body: { ... } })
+      const template = templates.find(t => t.id === validatedData.templateId);
+      if (!template) throw new Error("Template não encontrado");
+
+      let successCount = 0;
+      let failCount = 0;
+
+      // Enviar mensagens sequencialmente (máx 100 conforme schema)
+      for (const leadId of validatedData.leadIds) {
+        try {
+          const lead = leads.find(l => l.id === leadId);
+          if (!lead) continue;
+
+          // Personalizar mensagem
+          let message = template.body_content;
+          message = message.replace(/\{\{nome\}\}/g, lead.nome);
+          message = message.replace(/\{\{email\}\}/g, lead.email);
+          message = message.replace(/\{\{telefone\}\}/g, lead.telefone || "");
+          message = message.replace(/\{\{interesse\}\}/g, lead.interesse || "");
+
+          // Enviar via Edge Function
+          const { data, error } = await supabase.functions.invoke('whatsapp-send-message', {
+            body: {
+              campanhaId,
+              leadId,
+              message,
+              type: template.header_type || 'text',
+            }
+          });
+
+          if (error) throw error;
+          if (data.success) {
+            successCount++;
+          } else {
+            failCount++;
+          }
+        } catch (err) {
+          console.error(`Erro ao enviar para lead ${leadId}:`, err);
+          failCount++;
+        }
+      }
 
       toast({
-        title: "Mensagens enviadas",
-        description: "As mensagens foram enviadas com sucesso.",
+        title: "Envio concluído",
+        description: `${successCount} mensagens enviadas, ${failCount} falharam.`,
       });
 
       setSelectedLeads([]);
@@ -95,7 +126,7 @@ export const EnviarMensagemWhatsApp = ({ campanhaId }: EnviarMensagemWhatsAppPro
     } catch (error: any) {
       toast({
         title: "Erro ao enviar",
-        description: error.message,
+        description: error.issues?.[0]?.message || error.message,
         variant: "destructive",
       });
     } finally {
@@ -169,7 +200,7 @@ export const EnviarMensagemWhatsApp = ({ campanhaId }: EnviarMensagemWhatsAppPro
           </div>
 
           <Button onClick={handleSend} disabled={loading} className="w-full">
-            <Send className="mr-2 h-4 w-4" />
+            {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
             Enviar para {selectedLeads.length} lead(s)
           </Button>
         </CardContent>

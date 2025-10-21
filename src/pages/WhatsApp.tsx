@@ -17,7 +17,11 @@ const WhatsApp = () => {
     <Layout>
       <div className="flex h-[calc(100vh-4rem)] bg-background">
         {/* Sidebar - Campanhas, Configs, Templates */}
-        <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} border-r transition-all duration-300`}>
+        <div className={`
+          ${sidebarCollapsed ? 'w-16' : 'w-64'}
+          border-r transition-all duration-300
+          hidden md:block
+        `}>
           <WhatsAppSidebar
             selectedCampanhaId={selectedCampanhaId}
             onSelectCampanha={setSelectedCampanhaId}
@@ -27,7 +31,12 @@ const WhatsApp = () => {
         </div>
 
         {/* Lista de Conversas */}
-        <div className="w-80 border-r bg-muted/20">
+        <div className="
+          w-full md:w-80
+          border-r bg-muted/20
+          md:block
+          ${selectedConversationId ? 'hidden md:block' : 'block'}
+        ">
           <ConversationList
             campanhaId={selectedCampanhaId}
             selectedConversationId={selectedConversationId}
@@ -36,7 +45,10 @@ const WhatsApp = () => {
         </div>
 
         {/* Área do Chat */}
-        <div className="flex-1 bg-background">
+        <div className="
+          flex-1 bg-background
+          ${selectedConversationId ? 'block' : 'hidden md:block'}
+        ">
           <ChatInterface conversationId={selectedConversationId} />
         </div>
       </div>

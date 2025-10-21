@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, XCircle, QrCode } from "lucide-react";
+import { CheckCircle2, XCircle, QrCode, Loader2 } from "lucide-react";
+import { whatsappVenomConfigSchema } from "@/lib/validations/whatsapp";
 
 interface ConfigurarWhatsAppVenomProps {
   campanhaId: string;
@@ -25,6 +26,9 @@ export const ConfigurarWhatsAppVenom = ({ campanhaId, config, onUpdate }: Config
   const handleSave = async () => {
     setLoading(true);
     try {
+      // Validar com Zod
+      const validatedData = whatsappVenomConfigSchema.parse(formData);
+      
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Usuário não autenticado");
 
@@ -38,18 +42,22 @@ export const ConfigurarWhatsAppVenom = ({ campanhaId, config, onUpdate }: Config
         campanha_id: campanhaId,
         cliente_id: cliente?.id,
         api_type: "unofficial" as const,
-        ...formData,
+        ...validatedData,
       };
 
       if (config?.id) {
-        await supabase
+        const { error } = await supabase
           .from("whatsapp_config")
           .update(configData)
           .eq("id", config.id);
+        
+        if (error) throw error;
       } else {
-        await supabase
+        const { error } = await supabase
           .from("whatsapp_config")
           .insert(configData);
+        
+        if (error) throw error;
       }
 
       toast({
@@ -61,7 +69,7 @@ export const ConfigurarWhatsAppVenom = ({ campanhaId, config, onUpdate }: Config
     } catch (error: any) {
       toast({
         title: "Erro ao salvar",
-        description: error.message,
+        description: error.issues?.[0]?.message || error.message,
         variant: "destructive",
       });
     } finally {
@@ -130,9 +138,11 @@ export const ConfigurarWhatsAppVenom = ({ campanhaId, config, onUpdate }: Config
 
         <div className="flex gap-2">
           <Button onClick={handleSave} disabled={loading}>
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Salvar Configurações
           </Button>
           <Button variant="outline" onClick={handleGenerateQR} disabled={!config?.id}>
+            <QrCode className="mr-2 h-4 w-4" />
             Gerar QR Code
           </Button>
         </div>
