@@ -11,6 +11,9 @@ interface WhatsAppSidebarProps {
   onSelectCampanha: (campanhaId: string) => void;
   collapsed: boolean;
   onToggleCollapse: () => void;
+  onOpenConfig: () => void;
+  onOpenTemplates: () => void;
+  onOpenHistory: () => void;
 }
 
 interface Campanha {
@@ -18,7 +21,15 @@ interface Campanha {
   nome: string;
 }
 
-const WhatsAppSidebar = ({ selectedCampanhaId, onSelectCampanha, collapsed, onToggleCollapse }: WhatsAppSidebarProps) => {
+const WhatsAppSidebar = ({ 
+  selectedCampanhaId, 
+  onSelectCampanha, 
+  collapsed, 
+  onToggleCollapse,
+  onOpenConfig,
+  onOpenTemplates,
+  onOpenHistory
+}: WhatsAppSidebarProps) => {
   const [campanhas, setCampanhas] = useState<Campanha[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -67,16 +78,16 @@ const WhatsAppSidebar = ({ selectedCampanhaId, onSelectCampanha, collapsed, onTo
           <ChevronRight className="h-4 w-4" />
         </Button>
         <Separator />
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" title="Campanhas">
           <MessageSquare className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" onClick={onOpenConfig} title="Configurações">
           <Settings className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" onClick={onOpenTemplates} title="Templates">
           <FileText className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" onClick={onOpenHistory} title="Histórico">
           <History className="h-4 w-4" />
         </Button>
       </div>
@@ -126,15 +137,27 @@ const WhatsAppSidebar = ({ selectedCampanhaId, onSelectCampanha, collapsed, onTo
           <div>
             <h3 className="text-sm font-medium mb-2">Acesso Rápido</h3>
             <div className="space-y-1">
-              <Button variant="ghost" className="w-full justify-start">
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start"
+                onClick={onOpenConfig}
+              >
                 <Settings className="h-4 w-4 mr-2" />
                 Configurações
               </Button>
-              <Button variant="ghost" className="w-full justify-start">
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start"
+                onClick={onOpenTemplates}
+              >
                 <FileText className="h-4 w-4 mr-2" />
                 Templates
               </Button>
-              <Button variant="ghost" className="w-full justify-start">
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start"
+                onClick={onOpenHistory}
+              >
                 <History className="h-4 w-4 mr-2" />
                 Histórico
               </Button>
