@@ -43,16 +43,35 @@ const LandingPageRenderer = ({ cliente, isPreview = false }: LandingPageProps) =
       return;
     }
 
+    // Validação básica
+    if (!formData.nome.trim() || formData.nome.length < 2) {
+      toast({
+        title: "Erro",
+        description: "Por favor, insira um nome válido (mínimo 2 caracteres).",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      toast({
+        title: "Erro",
+        description: "Por favor, insira um email válido.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       // Usar edge function para criar lead e enviar webhook
       const { data, error } = await supabase.functions.invoke('webhook-lead', {
         body: {
           cliente_id: cliente.id,
-          nome: formData.nome,
-          email: formData.email,
-          telefone: formData.telefone || null,
-          interesse: formData.interesse || null,
+          nome: formData.nome.trim(),
+          email: formData.email.trim(),
+          telefone: formData.telefone?.trim() || undefined,
+          interesse: formData.interesse?.trim() || undefined,
           origem: 'formulario'
         }
       });
@@ -69,7 +88,7 @@ const LandingPageRenderer = ({ cliente, isPreview = false }: LandingPageProps) =
       console.error("Erro ao enviar lead:", error);
       toast({
         title: "Erro",
-        description: "Não foi possível enviar seus dados. Tente novamente.",
+        description: error.message || "Não foi possível enviar seus dados. Tente novamente.",
         variant: "destructive",
       });
     } finally {

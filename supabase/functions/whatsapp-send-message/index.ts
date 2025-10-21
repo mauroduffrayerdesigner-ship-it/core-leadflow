@@ -1,10 +1,21 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
+
+// Input validation schema
+const SendMessageSchema = z.object({
+  campanhaId: z.string().uuid('ID de campanha inválido'),
+  leadId: z.string().uuid('ID de lead inválido'),
+  conversationId: z.string().uuid('ID de conversa inválido').optional(),
+  message: z.string().min(1, 'Mensagem não pode estar vazia').max(4096, 'Mensagem muito longa'),
+  type: z.enum(['text', 'image', 'document']).default('text'),
+  mediaUrl: z.string().url('URL de mídia inválida').optional()
+})
 
 // Rate limiting simples (em produção usar Redis ou KV)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
@@ -30,16 +41,11 @@ serve(async (req) => {
   }
 
   try {
-    const { campanhaId, leadId, conversationId, message, type = 'text', mediaUrl } = await req.json()
+    const body = await req.json()
     
-    // Validação básica
-    if (!campanhaId || !leadId || !message) {
-      throw new Error('Campos obrigatórios: campanhaId, leadId, message')
-    }
-    
-    if (message.length > 4096) {
-      throw new Error('Mensagem muito longa (máx 4096 caracteres)')
-    }
+    // Validação com Zod
+    const validated = SendMessageSchema.parse(body)
+    const { campanhaId, leadId, conversationId, message, type, mediaUrl } = validated
     
     // Rate limiting
     const rateLimitKey = `whatsapp_send_${campanhaId}`
@@ -172,6 +178,18 @@ serve(async (req) => {
     
   } catch (error: any) {
     console.error('[whatsapp-send-message] Erro:', error)
+    
+    // Handle Zod validation errors
+    if (error instanceof z.ZodError) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Dados inválidos', 
+          details: error.errors.map(e => `${e.path.join('.')}: ${e.message}`)
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+    
     return new Response(
       JSON.stringify({ error: error.message }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

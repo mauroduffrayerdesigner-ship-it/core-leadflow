@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
@@ -8,6 +9,17 @@ const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Input validation schema
+const CreateLeadSchema = z.object({
+  cliente_id: z.string().uuid('ID de cliente inválido'),
+  campanha_id: z.string().uuid('ID de campanha inválido').optional(),
+  nome: z.string().min(2, 'Nome muito curto').max(100, 'Nome muito longo'),
+  email: z.string().email('Email inválido').max(255),
+  telefone: z.string().regex(/^\+?[1-9]\d{1,14}$/, 'Telefone inválido').optional(),
+  interesse: z.string().max(500, 'Interesse muito longo').optional(),
+  origem: z.string().default('formulario')
+});
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -19,7 +31,11 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     if (req.method === 'POST') {
-      const { cliente_id, campanha_id, nome, email, telefone, interesse, origem = 'formulario' } = await req.json();
+      const body = await req.json();
+      
+      // Validação com Zod
+      const validated = CreateLeadSchema.parse(body);
+      const { cliente_id, campanha_id, nome, email, telefone, interesse, origem } = validated;
 
       console.log('Criando lead:', { cliente_id, nome, email, origem });
 
@@ -143,6 +159,18 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in webhook-lead function:', error);
+    
+    // Handle Zod validation errors
+    if (error instanceof z.ZodError) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Dados inválidos', 
+          details: error.errors.map(e => `${e.path.join('.')}: ${e.message}`)
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(JSON.stringify({ 
       error: errorMessage 

@@ -329,7 +329,7 @@ export type Database = {
         Row: {
           assunto: string
           ativo: boolean | null
-          campanha_id: string | null
+          campanha_id: string
           corpo: string
           criado_em: string
           id: string
@@ -340,7 +340,7 @@ export type Database = {
         Insert: {
           assunto: string
           ativo?: boolean | null
-          campanha_id?: string | null
+          campanha_id: string
           corpo: string
           criado_em?: string
           id?: string
@@ -351,7 +351,7 @@ export type Database = {
         Update: {
           assunto?: string
           ativo?: boolean | null
-          campanha_id?: string | null
+          campanha_id?: string
           corpo?: string
           criado_em?: string
           id?: string
@@ -429,24 +429,42 @@ export type Database = {
       }
       lead_tags: {
         Row: {
+          cliente_id: string
           cor: string
           criado_em: string
           id: string
           nome: string
         }
         Insert: {
+          cliente_id: string
           cor?: string
           criado_em?: string
           id?: string
           nome: string
         }
         Update: {
+          cliente_id?: string
           cor?: string
           criado_em?: string
           id?: string
           nome?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "lead_tags_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_tags_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "landing_page_public"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       leads: {
         Row: {
@@ -687,6 +705,27 @@ export type Database = {
           id?: number
           nome?: string
           preview_url?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
         }
         Relationships: []
       }
@@ -1029,16 +1068,34 @@ export type Database = {
     Views: {
       landing_page_campanha_public: {
         Row: {
-          dominio_personalizado: string | null
           headline: string | null
           id: string | null
           logo_url: string | null
-          lp_publica: boolean | null
           nome: string | null
+          status: string | null
           subtitulo: string | null
           tema_id: number | null
           texto_cta: string | null
-          webhook_url: string | null
+        }
+        Insert: {
+          headline?: string | null
+          id?: string | null
+          logo_url?: string | null
+          nome?: string | null
+          status?: string | null
+          subtitulo?: string | null
+          tema_id?: number | null
+          texto_cta?: string | null
+        }
+        Update: {
+          headline?: string | null
+          id?: string | null
+          logo_url?: string | null
+          nome?: string | null
+          status?: string | null
+          subtitulo?: string | null
+          tema_id?: number | null
+          texto_cta?: string | null
         }
         Relationships: [
           {
@@ -1052,40 +1109,31 @@ export type Database = {
       }
       landing_page_public: {
         Row: {
-          dominio_personalizado: string | null
           headline: string | null
           id: string | null
           logo_url: string | null
-          lp_publica: boolean | null
           nome: string | null
           subtitulo: string | null
           tema_id: number | null
           texto_cta: string | null
-          webhook_url: string | null
         }
         Insert: {
-          dominio_personalizado?: string | null
           headline?: string | null
           id?: string | null
           logo_url?: string | null
-          lp_publica?: boolean | null
           nome?: string | null
           subtitulo?: string | null
           tema_id?: number | null
           texto_cta?: string | null
-          webhook_url?: string | null
         }
         Update: {
-          dominio_personalizado?: string | null
           headline?: string | null
           id?: string | null
           logo_url?: string | null
-          lp_publica?: boolean | null
           nome?: string | null
           subtitulo?: string | null
           tema_id?: number | null
           texto_cta?: string | null
-          webhook_url?: string | null
         }
         Relationships: [
           {
@@ -1099,10 +1147,16 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "user" | "admin" | "manager"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1229,6 +1283,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["user", "admin", "manager"],
+    },
   },
 } as const

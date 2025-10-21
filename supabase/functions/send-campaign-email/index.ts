@@ -1,10 +1,18 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Input validation schema
+const SendEmailSchema = z.object({
+  campanhaId: z.string().uuid('ID de campanha inválido'),
+  leadId: z.string().uuid('ID de lead inválido'),
+  templateId: z.string().uuid('ID de template inválido')
+});
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -12,131 +20,121 @@ serve(async (req) => {
   }
 
   try {
-    const { campanhaId, leadId, templateId } = await req.json();
+    const body = await req.json();
     
-    console.log('Enviando email:', { campanhaId, leadId, templateId });
+    // Validação com Zod
+    const validated = SendEmailSchema.parse(body);
+    const { campanhaId, leadId, templateId } = validated;
 
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
-
-    // Buscar dados da campanha
-    const { data: campanha, error: campanhaError } = await supabaseClient
-      .from('campanhas')
-      .select('*')
-      .eq('id', campanhaId)
-      .single();
-
-    if (campanhaError || !campanha) {
-      throw new Error('Campanha não encontrada');
-    }
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const brevoApiKey = Deno.env.get('BREVO_API_KEY')!;
+    
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Buscar dados do lead
-    const { data: lead, error: leadError } = await supabaseClient
+    const { data: lead, error: leadError } = await supabase
       .from('leads')
       .select('*')
       .eq('id', leadId)
       .single();
 
-    if (leadError || !lead) {
-      throw new Error('Lead não encontrado');
-    }
+    if (leadError) throw leadError;
 
     // Buscar template
-    const { data: template, error: templateError } = await supabaseClient
+    const { data: template, error: templateError } = await supabase
       .from('email_templates')
       .select('*')
       .eq('id', templateId)
       .single();
 
-    if (templateError || !template) {
-      throw new Error('Template não encontrado');
-    }
+    if (templateError) throw templateError;
+
+    // Buscar campanha
+    const { data: campanha, error: campanhaError } = await supabase
+      .from('campanhas')
+      .select('*')
+      .eq('id', campanhaId)
+      .single();
+
+    if (campanhaError) throw campanhaError;
 
     // Substituir variáveis no template
-    let assunto = template.assunto || 'Sem assunto';
-    let corpo = template.corpo || '';
+    let emailBody = template.corpo;
+    let emailSubject = template.assunto;
     
-    const variaveis: Record<string, string> = {
-      '{{nome}}': lead.nome || 'Cliente',
+    const variables: Record<string, string> = {
+      '{{nome}}': lead.nome || '',
       '{{email}}': lead.email || '',
-      '{{telefone}}': lead.telefone || 'Não informado',
-      '{{interesse}}': lead.interesse || 'Não informado',
-      '{{campanha}}': campanha.nome || 'Campanha',
+      '{{telefone}}': lead.telefone || '',
+      '{{interesse}}': lead.interesse || '',
     };
 
-    Object.entries(variaveis).forEach(([chave, valor]) => {
-      const regex = new RegExp(chave.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
-      assunto = assunto.replace(regex, valor);
-      corpo = corpo.replace(regex, valor);
+    Object.entries(variables).forEach(([key, value]) => {
+      emailBody = emailBody.replace(new RegExp(key, 'g'), value);
+      emailSubject = emailSubject.replace(new RegExp(key, 'g'), value);
     });
 
-    console.log('Enviando para Brevo:', lead.email);
-
-    // Enviar via Brevo
+    // Enviar email via Brevo
     const brevoResponse = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
       headers: {
-        'api-key': Deno.env.get('BREVO_API_KEY') ?? '',
+        'Accept': 'application/json',
         'Content-Type': 'application/json',
+        'api-key': brevoApiKey,
       },
       body: JSON.stringify({
         sender: {
           name: campanha.email_nome_remetente || 'CORE Capture',
-          email: campanha.email_remetente || 'noreply@corecapture.com',
+          email: campanha.email_remetente || 'contato@corecapture.com',
         },
-        to: [
-          {
-            email: lead.email,
-            name: lead.nome,
-          },
-        ],
-        subject: assunto,
-        htmlContent: corpo,
+        to: [{ email: lead.email, name: lead.nome }],
+        subject: emailSubject,
+        htmlContent: emailBody,
       }),
     });
 
-    const result = await brevoResponse.json();
-    console.log('Resposta Brevo:', result);
+    if (!brevoResponse.ok) {
+      const errorData = await brevoResponse.text();
+      throw new Error(`Brevo API error: ${errorData}`);
+    }
 
-    // Registrar log
-    const { error: logError } = await supabaseClient.from('email_logs').insert({
+    const brevoData = await brevoResponse.json();
+
+    // Salvar log
+    await supabase.from('email_logs').insert({
       campanha_id: campanhaId,
       lead_id: leadId,
       template_id: templateId,
       destinatario_email: lead.email,
       destinatario_nome: lead.nome,
-      assunto: assunto,
-      status: brevoResponse.ok ? 'enviado' : 'falha',
-      provider_message_id: result.messageId || null,
-      erro: brevoResponse.ok ? null : JSON.stringify(result),
+      assunto: emailSubject,
+      status: 'enviado',
+      provider_message_id: brevoData.messageId,
     });
 
-    if (logError) {
-      console.error('Erro ao registrar log:', logError);
-    }
-
     return new Response(
-      JSON.stringify({ 
-        success: brevoResponse.ok,
-        messageId: result.messageId,
-        message: brevoResponse.ok ? 'Email enviado com sucesso' : 'Falha ao enviar email',
-        error: brevoResponse.ok ? null : result
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: brevoResponse.ok ? 200 : 500,
-      }
+      JSON.stringify({ success: true, messageId: brevoData.messageId }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-  } catch (error: any) {
-    console.error('Erro ao enviar email:', error);
+
+  } catch (error) {
+    console.error('Error:', error);
+    
+    // Handle Zod validation errors
+    if (error instanceof z.ZodError) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Dados inválidos', 
+          details: error.errors.map(e => `${e.path.join('.')}: ${e.message}`)
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
     return new Response(
       JSON.stringify({ error: error.message }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
-      }
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });

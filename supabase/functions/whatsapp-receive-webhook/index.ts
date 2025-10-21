@@ -1,9 +1,25 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createHmac } from "https://deno.land/std@0.190.0/node/crypto.ts"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+// Verify WhatsApp webhook signature
+function verifySignature(body: string, signature: string | null, secret: string): boolean {
+  if (!signature || !secret) return false
+  
+  try {
+    const expectedSignature = createHmac('sha256', secret)
+      .update(body)
+      .digest('hex')
+    return `sha256=${expectedSignature}` === signature
+  } catch (error) {
+    console.error('Error verifying signature:', error)
+    return false
+  }
 }
 
 serve(async (req) => {
@@ -21,10 +37,33 @@ serve(async (req) => {
     console.log('[whatsapp-webhook] Verificação:', { mode, token })
     
     if (mode === 'subscribe' && token) {
-      // Verificar token (deveria vir da config do banco)
-      // Por enquanto aceitar qualquer token
+      // Verificar token contra configuração do banco
+      const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+      const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+      const supabase = createClient(supabaseUrl, supabaseKey)
+      
+      const { data: configs } = await supabase
+        .from('whatsapp_config')
+        .select('webhook_verify_token')
+        .eq('api_type', 'official')
+        .not('webhook_verify_token', 'is', null)
+      
+      // Verificar se o token corresponde a alguma configuração
+      const isValidToken = configs?.some(config => config.webhook_verify_token === token)
+      
+      if (!isValidToken) {
+        console.error('Invalid verification token')
+        return new Response('Invalid verification token', { 
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'text/plain' }
+        })
+      }
+      
       console.log('[whatsapp-webhook] Webhook verificado')
-      return new Response(challenge, { status: 200 })
+      return new Response(challenge, { 
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'text/plain' }
+      })
     }
     
     return new Response('Forbidden', { status: 403 })
@@ -32,14 +71,38 @@ serve(async (req) => {
 
   // POST - Receber mensagens
   try {
-    const body = await req.json()
-    console.log('[whatsapp-webhook] Payload recebido:', JSON.stringify(body, null, 2))
+    const rawBody = await req.text()
+    console.log('[whatsapp-webhook] Payload recebido')
     
     // Inicializar Supabase
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
+    
+    // Parsear payload
+    const body = JSON.parse(rawBody)
+    
+    // Verificar assinatura HMAC do WhatsApp (para API oficial)
+    const signature = req.headers.get('x-hub-signature-256')
+    
+    if (body.object === 'whatsapp_business_account') {
+      // Buscar configuração para validar assinatura
+      const { data: config } = await supabase
+        .from('whatsapp_config')
+        .select('webhook_verify_token')
+        .eq('api_type', 'official')
+        .limit(1)
+        .single()
+      
+      if (config && !verifySignature(rawBody, signature, config.webhook_verify_token)) {
+        console.error('Invalid webhook signature')
+        return new Response(
+          JSON.stringify({ error: 'Invalid signature' }), 
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+    }
     
     // Processar mensagens do WhatsApp Business API
     if (body.object === 'whatsapp_business_account') {

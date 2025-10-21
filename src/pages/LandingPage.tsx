@@ -9,11 +9,10 @@ interface Cliente {
   nome: string;
   logo_url?: string;
   tema_id: number;
-  webhook_url?: string;
-  dominio_personalizado?: string;
   headline?: string;
   subtitulo?: string;
   texto_cta?: string;
+  status?: string;
 }
 
 const LandingPage = () => {
@@ -33,7 +32,7 @@ const LandingPage = () => {
       console.log("Buscando campanha com ID:", campanhaId);
       const { data, error } = await supabase
         .from("landing_page_campanha_public")
-        .select("id, nome, logo_url, tema_id, webhook_url, dominio_personalizado, headline, subtitulo, texto_cta")
+        .select("id, nome, logo_url, tema_id, headline, subtitulo, texto_cta, status")
         .eq("id", campanhaId)
         .single();
 
@@ -45,7 +44,7 @@ const LandingPage = () => {
         return;
       }
 
-      setCliente(data);
+      setCliente(data as Cliente);
     } catch (error: any) {
       console.error("Erro ao buscar cliente:", error);
       setError("Erro ao carregar a landing page");

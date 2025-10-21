@@ -159,7 +159,14 @@ const ChatInterface = ({ conversationId }: ChatInterfaceProps) => {
   };
 
   const handleSendMessage = async () => {
-    if (!messageText.trim() || !conversationId || sending) return;
+    const trimmedMessage = messageText.trim();
+    if (!trimmedMessage || !conversationId || sending) return;
+
+    // Validação básica do tamanho da mensagem
+    if (trimmedMessage.length > 4096) {
+      toast.error("Mensagem muito longa (máximo 4096 caracteres)");
+      return;
+    }
 
     setSending(true);
     try {
@@ -182,7 +189,7 @@ const ChatInterface = ({ conversationId }: ChatInterfaceProps) => {
           campanhaId: conv.campanha_id,
           leadId: conv.lead_id,
           conversationId: conversationId,
-          message: messageText,
+          message: trimmedMessage,
           type: 'text',
         }
       });
@@ -197,7 +204,8 @@ const ChatInterface = ({ conversationId }: ChatInterfaceProps) => {
       }
     } catch (error: any) {
       console.error("Erro ao enviar mensagem:", error);
-      toast.error("Erro ao enviar mensagem");
+      const errorMsg = error.message || "Erro ao enviar mensagem";
+      toast.error(errorMsg);
     } finally {
       setSending(false);
     }
