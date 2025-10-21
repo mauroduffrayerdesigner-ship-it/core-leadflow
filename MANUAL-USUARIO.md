@@ -11,9 +11,11 @@
 5. [Landing Pages](#-landing-pages)
 6. [Gestão de Leads](#-gestão-de-leads)
 7. [Email Marketing](#-email-marketing)
-8. [Integrações e Webhooks](#-integrações-e-webhooks)
-9. [Métricas e Relatórios](#-métricas-e-relatórios)
-10. [Dicas e Melhores Práticas](#-dicas-e-melhores-práticas)
+8. [WhatsApp Business](#-whatsapp-business) ⭐ **Novo!**
+9. [Integrações e Webhooks](#-integrações-e-webhooks)
+10. [Métricas e Relatórios](#-métricas-e-relatórios)
+11. [Dark Mode / Light Mode](#-dark-mode--light-mode) ⭐ **Novo!**
+12. [Dicas e Melhores Práticas](#-dicas-e-melhores-práticas)
 
 ---
 
