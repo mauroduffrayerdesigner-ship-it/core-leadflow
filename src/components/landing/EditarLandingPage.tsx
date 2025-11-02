@@ -10,6 +10,8 @@ import { Loader2, Save, Eye, Upload } from "lucide-react";
 import TemasLanding from "./TemasLanding";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import LandingPageRenderer from "./LandingPageRenderer";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import UploadLandingCustom from "./UploadLandingCustom";
 
 interface Cliente {
   id: string;
@@ -150,15 +152,23 @@ const EditarLandingPage = ({ clienteId }: EditarLandingPageProps) => {
 
   return (
     <div className="space-y-8">
-      {/* Configurações de Conteúdo */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Configurações de Conteúdo</CardTitle>
-          <CardDescription>
-            Personalize os textos da sua landing page
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
+      <Tabs defaultValue="content">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="content">Conteúdo</TabsTrigger>
+          <TabsTrigger value="theme">Tema</TabsTrigger>
+          <TabsTrigger value="custom">HTML Customizado</TabsTrigger>
+          <TabsTrigger value="url">URL</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="content" className="space-y-6 mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Configurações de Conteúdo</CardTitle>
+              <CardDescription>
+                Personalize os textos da sua landing page
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="headline">Título Principal (Headline)</Label>
@@ -245,8 +255,9 @@ const EditarLandingPage = ({ clienteId }: EditarLandingPageProps) => {
           </div>
         </CardContent>
       </Card>
+    </TabsContent>
 
-      {/* Seleção de Tema */}
+    <TabsContent value="theme" className="space-y-6 mt-6">
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Temas Disponíveis</h3>
         <TemasLanding 
@@ -255,8 +266,16 @@ const EditarLandingPage = ({ clienteId }: EditarLandingPageProps) => {
           onTemaSelect={handleTemaSelect}
         />
       </div>
+    </TabsContent>
 
-      {/* URL da Landing Page */}
+    <TabsContent value="custom" className="space-y-6 mt-6">
+      <UploadLandingCustom
+        clienteId={clienteId}
+        onSuccess={fetchCliente}
+      />
+    </TabsContent>
+
+    <TabsContent value="url" className="space-y-6 mt-6">
       <Card>
         <CardHeader>
           <CardTitle>URL da Landing Page</CardTitle>
@@ -280,11 +299,13 @@ const EditarLandingPage = ({ clienteId }: EditarLandingPageProps) => {
                 });
               }}
             >
-              Copiar
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+            Copiar
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  </TabsContent>
+</Tabs>
 
       {/* Modal de Preview */}
       <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>

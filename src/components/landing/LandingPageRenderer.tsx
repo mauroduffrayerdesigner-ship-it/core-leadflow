@@ -532,7 +532,7 @@ const LandingPageRenderer = ({ cliente, isPreview = false }: LandingPageProps) =
                     Consultoria <span className="bg-gradient-to-r from-amber-400 to-yellow-500 bg-clip-text text-transparent">Premium</span>
                   </h1>
                   <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-                    Soluções exclusivas para líderes visionários que buscam transformação estratégica e resultados excepcionais.
+                    {cliente.subtitulo || "Soluções exclusivas para líderes visionários que buscam transformação estratégica e resultados excepcionais."}
                   </p>
                 </div>
 
@@ -602,7 +602,7 @@ const LandingPageRenderer = ({ cliente, isPreview = false }: LandingPageProps) =
                         rows={4}
                       />
                       <Button type="submit" className="w-full h-12 text-lg bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-black font-bold" disabled={loading}>
-                        {loading ? "Enviando..." : "Solicitar Diagnóstico"}
+                        {loading ? "Enviando..." : (cliente.texto_cta || "Solicitar Diagnóstico")}
                       </Button>
                     </form>
                   </CardContent>
@@ -612,7 +612,7 @@ const LandingPageRenderer = ({ cliente, isPreview = false }: LandingPageProps) =
           </div>
         );
 
-      case 6: // VSL Video
+      case 7: // SaaS Moderno
         return (
           <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white">
             <div className="container mx-auto px-4 py-12">
@@ -697,61 +697,123 @@ const LandingPageRenderer = ({ cliente, isPreview = false }: LandingPageProps) =
           </div>
         );
 
-      case 7: // Gift Bonus
+      case 7: // SaaS Moderno
         return (
-          <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50">
+          <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 text-white">
             <div className="container mx-auto px-4 py-16">
-              <div className="max-w-4xl mx-auto">
-                {cliente.logo_url && (
-                  <div className="text-center mb-8">
-                    <img src={cliente.logo_url} alt={cliente.nome} className="h-16 mx-auto" />
-                  </div>
-                )}
-                
-                <div className="text-center mb-12">
-                  <div className="inline-block px-6 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 rounded-full text-black font-bold mb-4">
-                    🎁 BÔNUS EXCLUSIVO
-                  </div>
-                  <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
-                    {cliente.headline || "Presente Especial Para Você"}
+              <div className="max-w-6xl mx-auto">
+                <div className="text-center mb-16">
+                  {cliente.logo_url && (
+                    <img src={cliente.logo_url} alt={cliente.nome} className="h-16 mx-auto mb-8 filter brightness-0 invert" />
+                  )}
+                  <h1 className="text-5xl md:text-7xl font-bold mb-6">
+                    {cliente.headline || "Software que"} <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Escala</span>
                   </h1>
-                  <p className="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
-                    {cliente.subtitulo || "Cadastre-se agora e ganhe acesso imediato ao seu bônus exclusivo"}
+                  <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+                    {cliente.subtitulo || "Plataforma SaaS completa para automatizar e escalar seu negócio com tecnologia de ponta."}
                   </p>
                 </div>
 
-                {/* Gift Card Visual */}
-                <div className="mb-12 relative">
-                  <div className="bg-gradient-to-br from-amber-400 via-yellow-500 to-orange-500 rounded-3xl p-1 shadow-2xl transform hover:scale-105 transition-transform">
-                    <div className="bg-white rounded-3xl p-12 text-center">
-                      <div className="text-8xl mb-4">🎁</div>
-                      <h3 className="text-3xl font-bold text-gray-900 mb-2">Seu Bônus Exclusivo</h3>
-                      <p className="text-lg text-gray-600 mb-4">Valor estimado: R$ 997,00</p>
-                      <div className="inline-block px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-full text-xl">
-                        100% GRÁTIS
-                      </div>
-                    </div>
+                <div className="grid md:grid-cols-3 gap-6 mb-16">
+                  <div className="bg-white/10 backdrop-blur-lg p-6 rounded-xl border border-white/20">
+                    <h3 className="text-3xl font-bold text-cyan-400 mb-2">14 dias</h3>
+                    <p className="text-gray-300">Teste grátis</p>
                   </div>
-                  {/* Ribbon */}
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <div className="bg-red-600 text-white px-8 py-2 rounded-full font-bold shadow-lg">
-                      OFERTA LIMITADA
-                    </div>
+                  <div className="bg-white/10 backdrop-blur-lg p-6 rounded-xl border border-white/20">
+                    <h3 className="text-3xl font-bold text-blue-400 mb-2">99.9%</h3>
+                    <p className="text-gray-300">Uptime SLA</p>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-lg p-6 rounded-xl border border-white/20">
+                    <h3 className="text-3xl font-bold text-purple-400 mb-2">24/7</h3>
+                    <p className="text-gray-300">Suporte premium</p>
                   </div>
                 </div>
 
-                {/* Form */}
-                <Card className="max-w-lg mx-auto shadow-2xl border-2 border-amber-300">
+                <Card className="max-w-lg mx-auto bg-white/10 backdrop-blur-lg border-white/20">
                   <CardContent className="p-8">
-                    <h2 className="text-2xl font-bold mb-6 text-center">
-                      Resgatar Meu Bônus Agora
-                    </h2>
+                    <h2 className="text-2xl font-bold mb-6 text-center">Comece Agora</h2>
                     <form onSubmit={handleSubmit} className="space-y-4">
                       <Input
                         placeholder="Nome completo"
                         value={formData.nome}
                         onChange={(e) => setFormData({...formData, nome: e.target.value})}
-                        className="h-12 border-amber-300"
+                        className="bg-white/10 border-white/30 text-white placeholder-gray-300 h-12"
+                        required
+                      />
+                      <Input
+                        type="email"
+                        placeholder="E-mail corporativo"
+                        value={formData.email}
+                        onChange={(e) => setFormData({...formData, email: e.target.value})}
+                        className="bg-white/10 border-white/30 text-white placeholder-gray-300 h-12"
+                        required
+                      />
+                      <Input
+                        placeholder="Empresa"
+                        value={formData.telefone}
+                        onChange={(e) => setFormData({...formData, telefone: e.target.value})}
+                        className="bg-white/10 border-white/30 text-white placeholder-gray-300 h-12"
+                      />
+                      <Button type="submit" className="w-full h-12 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold" disabled={loading}>
+                        {loading ? "Enviando..." : (cliente.texto_cta || "Iniciar Teste Grátis")}
+                      </Button>
+                    </form>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 8: // Saúde & Bem-estar
+        return (
+          <div className="min-h-screen bg-gradient-to-br from-teal-50 via-cyan-50 to-blue-50">
+            <div className="container mx-auto px-4 py-16">
+              <div className="max-w-5xl mx-auto">
+                <div className="text-center mb-16">
+                  {cliente.logo_url && (
+                    <img src={cliente.logo_url} alt={cliente.nome} className="h-20 mx-auto mb-8" />
+                  )}
+                  <h1 className="text-5xl md:text-6xl font-bold mb-6 text-gray-900">
+                    Sua <span className="text-teal-600">Saúde</span> em Primeiro Lugar
+                  </h1>
+                  <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+                    {cliente.subtitulo || "Cuidado profissional e personalizado para o seu bem-estar físico, mental e emocional."}
+                  </p>
+                </div>
+
+                <div className="grid md:grid-cols-4 gap-6 mb-16">
+                  <div className="bg-white p-6 rounded-xl shadow-lg text-center">
+                    <span className="text-4xl mb-3 block">🏥</span>
+                    <h3 className="font-bold">Atendimento</h3>
+                    <p className="text-sm text-gray-600">Profissional</p>
+                  </div>
+                  <div className="bg-white p-6 rounded-xl shadow-lg text-center">
+                    <span className="text-4xl mb-3 block">💚</span>
+                    <h3 className="font-bold">Cuidado</h3>
+                    <p className="text-sm text-gray-600">Personalizado</p>
+                  </div>
+                  <div className="bg-white p-6 rounded-xl shadow-lg text-center">
+                    <span className="text-4xl mb-3 block">🧘</span>
+                    <h3 className="font-bold">Bem-estar</h3>
+                    <p className="text-sm text-gray-600">Integral</p>
+                  </div>
+                  <div className="bg-white p-6 rounded-xl shadow-lg text-center">
+                    <span className="text-4xl mb-3 block">⭐</span>
+                    <h3 className="font-bold">Resultados</h3>
+                    <p className="text-sm text-gray-600">Comprovados</p>
+                  </div>
+                </div>
+
+                <Card className="max-w-lg mx-auto shadow-2xl border-0">
+                  <CardContent className="p-8">
+                    <h2 className="text-2xl font-bold mb-6 text-center">Agende sua Consulta</h2>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <Input
+                        placeholder="Nome completo"
+                        value={formData.nome}
+                        onChange={(e) => setFormData({...formData, nome: e.target.value})}
+                        className="h-12"
                         required
                       />
                       <Input
@@ -759,32 +821,176 @@ const LandingPageRenderer = ({ cliente, isPreview = false }: LandingPageProps) =
                         placeholder="E-mail"
                         value={formData.email}
                         onChange={(e) => setFormData({...formData, email: e.target.value})}
-                        className="h-12 border-amber-300"
+                        className="h-12"
+                        required
+                      />
+                      <Input
+                        placeholder="Telefone/WhatsApp"
+                        value={formData.telefone}
+                        onChange={(e) => setFormData({...formData, telefone: e.target.value})}
+                        className="h-12"
+                      />
+                      <Textarea
+                        placeholder="Como podemos ajudar você?"
+                        value={formData.interesse}
+                        onChange={(e) => setFormData({...formData, interesse: e.target.value})}
+                        rows={3}
+                      />
+                      <Button type="submit" className="w-full h-12 bg-teal-600 hover:bg-teal-700" disabled={loading}>
+                        {loading ? "Enviando..." : (cliente.texto_cta || "Agendar Consulta")}
+                      </Button>
+                    </form>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 9: // Educação Online
+        return (
+          <div className="min-h-screen bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 text-white">
+            <div className="container mx-auto px-4 py-16">
+              <div className="max-w-6xl mx-auto">
+                <div className="text-center mb-16">
+                  {cliente.logo_url && (
+                    <img src={cliente.logo_url} alt={cliente.nome} className="h-16 mx-auto mb-8 filter brightness-0 invert" />
+                  )}
+                  <h1 className="text-5xl md:text-6xl font-bold mb-6">
+                    {cliente.headline || "Aprenda no Seu"} <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">Ritmo</span>
+                  </h1>
+                  <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+                    {cliente.subtitulo || "Cursos online de alta qualidade com certificação reconhecida no mercado."}
+                  </p>
+                </div>
+
+                <div className="grid md:grid-cols-3 gap-8 mb-16">
+                  <div className="bg-white/10 backdrop-blur-lg p-8 rounded-xl border border-white/20 text-center">
+                    <div className="text-4xl mb-4">📚</div>
+                    <h3 className="text-xl font-bold mb-2">+500 Cursos</h3>
+                    <p className="text-gray-300">Conteúdo exclusivo</p>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-lg p-8 rounded-xl border border-white/20 text-center">
+                    <div className="text-4xl mb-4">🎓</div>
+                    <h3 className="text-xl font-bold mb-2">Certificação</h3>
+                    <p className="text-gray-300">Reconhecida</p>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-lg p-8 rounded-xl border border-white/20 text-center">
+                    <div className="text-4xl mb-4">👥</div>
+                    <h3 className="text-xl font-bold mb-2">+50mil Alunos</h3>
+                    <p className="text-gray-300">Satisfeitos</p>
+                  </div>
+                </div>
+
+                <Card className="max-w-lg mx-auto bg-white/10 backdrop-blur-lg border-white/20">
+                  <CardContent className="p-8">
+                    <h2 className="text-2xl font-bold mb-6 text-center text-white">Comece Hoje Mesmo</h2>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <Input
+                        placeholder="Seu nome"
+                        value={formData.nome}
+                        onChange={(e) => setFormData({...formData, nome: e.target.value})}
+                        className="bg-white/10 border-white/30 text-white placeholder-gray-300 h-12"
+                        required
+                      />
+                      <Input
+                        type="email"
+                        placeholder="E-mail"
+                        value={formData.email}
+                        onChange={(e) => setFormData({...formData, email: e.target.value})}
+                        className="bg-white/10 border-white/30 text-white placeholder-gray-300 h-12"
                         required
                       />
                       <Input
                         placeholder="WhatsApp"
                         value={formData.telefone}
                         onChange={(e) => setFormData({...formData, telefone: e.target.value})}
-                        className="h-12 border-amber-300"
+                        className="bg-white/10 border-white/30 text-white placeholder-gray-300 h-12"
                       />
-                      <Button type="submit" className="w-full h-14 text-lg bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold shadow-lg" disabled={loading}>
-                        {loading ? "Enviando..." : (cliente.texto_cta || "🎁 RESGATAR BÔNUS GRÁTIS")}
+                      <Textarea
+                        placeholder="Qual área você quer estudar?"
+                        value={formData.interesse}
+                        onChange={(e) => setFormData({...formData, interesse: e.target.value})}
+                        className="bg-white/10 border-white/30 text-white placeholder-gray-300"
+                        rows={3}
+                      />
+                      <Button type="submit" className="w-full h-12 bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-bold" disabled={loading}>
+                        {loading ? "Enviando..." : (cliente.texto_cta || "Quero Me Inscrever")}
                       </Button>
                     </form>
-                    <p className="text-center text-sm text-gray-500 mt-4">
-                      ✓ Acesso imediato após cadastro
-                    </p>
                   </CardContent>
                 </Card>
+              </div>
+            </div>
+          </div>
+        );
 
-                {/* QR Code Section */}
-                <div className="mt-16 text-center">
-                  <p className="text-gray-600 mb-4 font-semibold">Compartilhe este presente:</p>
-                  <div className="inline-block p-6 bg-white rounded-2xl shadow-xl border-2 border-amber-300">
-                    <QRCodeSVG value={getLandingPageUrl()} size={150} />
+      case 10: // Agência Digital
+        return (
+          <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 text-white">
+            <div className="container mx-auto px-4 py-16">
+              <div className="max-w-6xl mx-auto">
+                <div className="grid lg:grid-cols-2 gap-12 items-center">
+                  <div className="space-y-8">
+                    {cliente.logo_url && (
+                      <img src={cliente.logo_url} alt={cliente.nome} className="h-14 filter brightness-0 invert" />
+                    )}
+                    <h1 className="text-6xl md:text-7xl font-bold leading-tight">
+                      {cliente.headline || "Design que"} <span className="bg-gradient-to-r from-pink-400 to-purple-500 bg-clip-text text-transparent">Impacta</span>
+                    </h1>
+                    <p className="text-xl text-gray-300">
+                      {cliente.subtitulo || "Criamos experiências digitais memoráveis que transformam marcas e conquistam clientes."}
+                    </p>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-white/10 backdrop-blur-lg p-6 rounded-xl border border-white/20">
+                        <h3 className="text-2xl font-bold text-pink-400 mb-1">300+</h3>
+                        <p className="text-gray-300 text-sm">Projetos</p>
+                      </div>
+                      <div className="bg-white/10 backdrop-blur-lg p-6 rounded-xl border border-white/20">
+                        <h3 className="text-2xl font-bold text-purple-400 mb-1">98%</h3>
+                        <p className="text-gray-300 text-sm">Satisfação</p>
+                      </div>
+                    </div>
                   </div>
-                  <p className="text-sm text-gray-500 mt-3">{getLandingPageUrl()}</p>
+
+                  <Card className="bg-white/10 backdrop-blur-lg border-white/20">
+                    <CardContent className="p-8">
+                      <h2 className="text-2xl font-bold mb-6 text-white">Fale com Nosso Time</h2>
+                      <form onSubmit={handleSubmit} className="space-y-4">
+                        <Input
+                          placeholder="Nome"
+                          value={formData.nome}
+                          onChange={(e) => setFormData({...formData, nome: e.target.value})}
+                          className="bg-white/10 border-white/30 text-white placeholder-gray-300 h-12"
+                          required
+                        />
+                        <Input
+                          type="email"
+                          placeholder="E-mail"
+                          value={formData.email}
+                          onChange={(e) => setFormData({...formData, email: e.target.value})}
+                          className="bg-white/10 border-white/30 text-white placeholder-gray-300 h-12"
+                          required
+                        />
+                        <Input
+                          placeholder="Empresa/Site"
+                          value={formData.telefone}
+                          onChange={(e) => setFormData({...formData, telefone: e.target.value})}
+                          className="bg-white/10 border-white/30 text-white placeholder-gray-300 h-12"
+                        />
+                        <Textarea
+                          placeholder="Conte sobre seu projeto"
+                          value={formData.interesse}
+                          onChange={(e) => setFormData({...formData, interesse: e.target.value})}
+                          className="bg-white/10 border-white/30 text-white placeholder-gray-300"
+                          rows={3}
+                        />
+                        <Button type="submit" className="w-full h-12 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold" disabled={loading}>
+                          {loading ? "Enviando..." : (cliente.texto_cta || "Solicitar Orçamento")}
+                        </Button>
+                      </form>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
             </div>
