@@ -72,6 +72,13 @@ export type Database = {
             foreignKeyName: "assinaturas_email_campanha_id_fkey"
             columns: ["campanha_id"]
             isOneToOne: false
+            referencedRelation: "landing_page_campanha_custom_public"
+            referencedColumns: ["campanha_id"]
+          },
+          {
+            foreignKeyName: "assinaturas_email_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
             referencedRelation: "landing_page_campanha_public"
             referencedColumns: ["id"]
           },
@@ -84,6 +91,7 @@ export type Database = {
           cliente_id: string
           configuracoes: Json | null
           criado_em: string
+          custom_landing_id: string | null
           descricao: string | null
           dominio_personalizado: string | null
           email_auto_envio: boolean | null
@@ -108,6 +116,7 @@ export type Database = {
           cliente_id: string
           configuracoes?: Json | null
           criado_em?: string
+          custom_landing_id?: string | null
           descricao?: string | null
           dominio_personalizado?: string | null
           email_auto_envio?: boolean | null
@@ -132,6 +141,7 @@ export type Database = {
           cliente_id?: string
           configuracoes?: Json | null
           criado_em?: string
+          custom_landing_id?: string | null
           descricao?: string | null
           dominio_personalizado?: string | null
           email_auto_envio?: boolean | null
@@ -169,7 +179,35 @@ export type Database = {
             foreignKeyName: "campanhas_cliente_id_fkey"
             columns: ["cliente_id"]
             isOneToOne: false
+            referencedRelation: "landing_page_cliente_custom_public"
+            referencedColumns: ["cliente_id"]
+          },
+          {
+            foreignKeyName: "campanhas_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
             referencedRelation: "landing_page_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campanhas_custom_landing_id_fkey"
+            columns: ["custom_landing_id"]
+            isOneToOne: false
+            referencedRelation: "landing_page_campanha_custom_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campanhas_custom_landing_id_fkey"
+            columns: ["custom_landing_id"]
+            isOneToOne: false
+            referencedRelation: "landing_page_cliente_custom_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campanhas_custom_landing_id_fkey"
+            columns: ["custom_landing_id"]
+            isOneToOne: false
+            referencedRelation: "landing_pages_custom"
             referencedColumns: ["id"]
           },
           {
@@ -199,6 +237,7 @@ export type Database = {
         Row: {
           configuracoes: Json | null
           criado_em: string | null
+          custom_landing_id: string | null
           dominio_personalizado: string | null
           email: string
           headline: string | null
@@ -215,6 +254,7 @@ export type Database = {
         Insert: {
           configuracoes?: Json | null
           criado_em?: string | null
+          custom_landing_id?: string | null
           dominio_personalizado?: string | null
           email: string
           headline?: string | null
@@ -231,6 +271,7 @@ export type Database = {
         Update: {
           configuracoes?: Json | null
           criado_em?: string | null
+          custom_landing_id?: string | null
           dominio_personalizado?: string | null
           email?: string
           headline?: string | null
@@ -245,6 +286,27 @@ export type Database = {
           webhook_url?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "clientes_custom_landing_id_fkey"
+            columns: ["custom_landing_id"]
+            isOneToOne: false
+            referencedRelation: "landing_page_campanha_custom_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clientes_custom_landing_id_fkey"
+            columns: ["custom_landing_id"]
+            isOneToOne: false
+            referencedRelation: "landing_page_cliente_custom_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clientes_custom_landing_id_fkey"
+            columns: ["custom_landing_id"]
+            isOneToOne: false
+            referencedRelation: "landing_pages_custom"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "fk_clientes_tema"
             columns: ["tema_id"]
@@ -301,6 +363,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "campanhas"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_logs_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
+            referencedRelation: "landing_page_campanha_custom_public"
+            referencedColumns: ["campanha_id"]
           },
           {
             foreignKeyName: "email_logs_campanha_id_fkey"
@@ -371,7 +440,96 @@ export type Database = {
             foreignKeyName: "email_templates_campanha_id_fkey"
             columns: ["campanha_id"]
             isOneToOne: false
+            referencedRelation: "landing_page_campanha_custom_public"
+            referencedColumns: ["campanha_id"]
+          },
+          {
+            foreignKeyName: "email_templates_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
             referencedRelation: "landing_page_campanha_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      landing_pages_custom: {
+        Row: {
+          ativo: boolean | null
+          atualizado_em: string | null
+          campanha_id: string | null
+          cliente_id: string | null
+          criado_em: string | null
+          css_content: string | null
+          html_content: string
+          id: string
+          js_content: string | null
+          nome: string
+        }
+        Insert: {
+          ativo?: boolean | null
+          atualizado_em?: string | null
+          campanha_id?: string | null
+          cliente_id?: string | null
+          criado_em?: string | null
+          css_content?: string | null
+          html_content: string
+          id?: string
+          js_content?: string | null
+          nome: string
+        }
+        Update: {
+          ativo?: boolean | null
+          atualizado_em?: string | null
+          campanha_id?: string | null
+          cliente_id?: string | null
+          criado_em?: string | null
+          css_content?: string | null
+          html_content?: string
+          id?: string
+          js_content?: string | null
+          nome?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "landing_pages_custom_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
+            referencedRelation: "campanhas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "landing_pages_custom_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
+            referencedRelation: "landing_page_campanha_custom_public"
+            referencedColumns: ["campanha_id"]
+          },
+          {
+            foreignKeyName: "landing_pages_custom_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
+            referencedRelation: "landing_page_campanha_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "landing_pages_custom_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "landing_pages_custom_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "landing_page_cliente_custom_public"
+            referencedColumns: ["cliente_id"]
+          },
+          {
+            foreignKeyName: "landing_pages_custom_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "landing_page_public"
             referencedColumns: ["id"]
           },
         ]
@@ -461,6 +619,13 @@ export type Database = {
             foreignKeyName: "lead_tags_cliente_id_fkey"
             columns: ["cliente_id"]
             isOneToOne: false
+            referencedRelation: "landing_page_cliente_custom_public"
+            referencedColumns: ["cliente_id"]
+          },
+          {
+            foreignKeyName: "lead_tags_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
             referencedRelation: "landing_page_public"
             referencedColumns: ["id"]
           },
@@ -521,6 +686,13 @@ export type Database = {
             foreignKeyName: "leads_campanha_id_fkey"
             columns: ["campanha_id"]
             isOneToOne: false
+            referencedRelation: "landing_page_campanha_custom_public"
+            referencedColumns: ["campanha_id"]
+          },
+          {
+            foreignKeyName: "leads_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
             referencedRelation: "landing_page_campanha_public"
             referencedColumns: ["id"]
           },
@@ -530,6 +702,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "clientes"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "landing_page_cliente_custom_public"
+            referencedColumns: ["cliente_id"]
           },
           {
             foreignKeyName: "leads_cliente_id_fkey"
@@ -592,6 +771,13 @@ export type Database = {
             foreignKeyName: "metricas_campanha_campanha_id_fkey"
             columns: ["campanha_id"]
             isOneToOne: false
+            referencedRelation: "landing_page_campanha_custom_public"
+            referencedColumns: ["campanha_id"]
+          },
+          {
+            foreignKeyName: "metricas_campanha_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
             referencedRelation: "landing_page_campanha_public"
             referencedColumns: ["id"]
           },
@@ -644,6 +830,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "clientes"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "metricas_cliente_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "landing_page_cliente_custom_public"
+            referencedColumns: ["cliente_id"]
           },
           {
             foreignKeyName: "metricas_cliente_cliente_id_fkey"
@@ -814,6 +1007,13 @@ export type Database = {
             foreignKeyName: "whatsapp_config_campanha_id_fkey"
             columns: ["campanha_id"]
             isOneToOne: false
+            referencedRelation: "landing_page_campanha_custom_public"
+            referencedColumns: ["campanha_id"]
+          },
+          {
+            foreignKeyName: "whatsapp_config_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
             referencedRelation: "landing_page_campanha_public"
             referencedColumns: ["id"]
           },
@@ -823,6 +1023,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "clientes"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whatsapp_config_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "landing_page_cliente_custom_public"
+            referencedColumns: ["cliente_id"]
           },
           {
             foreignKeyName: "whatsapp_config_cliente_id_fkey"
@@ -889,6 +1096,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "campanhas"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whatsapp_conversations_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
+            referencedRelation: "landing_page_campanha_custom_public"
+            referencedColumns: ["campanha_id"]
           },
           {
             foreignKeyName: "whatsapp_conversations_campanha_id_fkey"
@@ -979,6 +1193,13 @@ export type Database = {
             foreignKeyName: "whatsapp_messages_campanha_id_fkey"
             columns: ["campanha_id"]
             isOneToOne: false
+            referencedRelation: "landing_page_campanha_custom_public"
+            referencedColumns: ["campanha_id"]
+          },
+          {
+            foreignKeyName: "whatsapp_messages_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
             referencedRelation: "landing_page_campanha_public"
             referencedColumns: ["id"]
           },
@@ -1059,6 +1280,13 @@ export type Database = {
             foreignKeyName: "whatsapp_templates_campanha_id_fkey"
             columns: ["campanha_id"]
             isOneToOne: false
+            referencedRelation: "landing_page_campanha_custom_public"
+            referencedColumns: ["campanha_id"]
+          },
+          {
+            foreignKeyName: "whatsapp_templates_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
             referencedRelation: "landing_page_campanha_public"
             referencedColumns: ["id"]
           },
@@ -1066,6 +1294,18 @@ export type Database = {
       }
     }
     Views: {
+      landing_page_campanha_custom_public: {
+        Row: {
+          campanha_id: string | null
+          css_content: string | null
+          html_content: string | null
+          id: string | null
+          js_content: string | null
+          nome: string | null
+          status: string | null
+        }
+        Relationships: []
+      }
       landing_page_campanha_public: {
         Row: {
           headline: string | null
@@ -1106,6 +1346,17 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      landing_page_cliente_custom_public: {
+        Row: {
+          cliente_id: string | null
+          css_content: string | null
+          html_content: string | null
+          id: string | null
+          js_content: string | null
+          nome: string | null
+        }
+        Relationships: []
       }
       landing_page_public: {
         Row: {
