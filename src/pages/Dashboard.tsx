@@ -10,135 +10,135 @@ import MetricasAvancadas from "@/components/dashboard/MetricasAvancadas";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
-
 const Dashboard = () => {
   const [selectedCampanha, setSelectedCampanha] = useState<string>("todas");
-  const [campanhas, setCampanhas] = useState<Array<{ id: string; nome: string }>>([]);
+  const [campanhas, setCampanhas] = useState<Array<{
+    id: string;
+    nome: string;
+  }>>([]);
   const [stats, setStats] = useState({
     totalLeads: 0,
     leadsEsteMs: 0,
     leadsEsteMesAnterior: 0,
     totalClientes: 0,
     landingPagesAtivas: 0,
-    taxaConversaoMedia: 0,
+    taxaConversaoMedia: 0
   });
-
   useEffect(() => {
     fetchCampanhas();
   }, []);
-
   useEffect(() => {
     fetchStats();
   }, [selectedCampanha]);
-
   const fetchCampanhas = async () => {
     try {
-      const { data, error } = await supabase
-        .from("campanhas")
-        .select("id, nome")
-        .order("nome");
-
+      const {
+        data,
+        error
+      } = await supabase.from("campanhas").select("id, nome").order("nome");
       if (error) throw error;
       setCampanhas(data || []);
     } catch (error: any) {
       console.error("Erro ao buscar campanhas:", error);
     }
   };
-
   const fetchStats = async () => {
     try {
       // Filtro de campanha
       const campanhaFilter = selectedCampanha !== "todas" ? selectedCampanha : null;
 
       // Total de leads (filtrado por campanha se selecionada)
-      let leadsQuery = supabase.from("leads").select("*", { count: "exact", head: true });
+      let leadsQuery = supabase.from("leads").select("*", {
+        count: "exact",
+        head: true
+      });
       if (campanhaFilter) {
         leadsQuery = leadsQuery.eq("campanha_id", campanhaFilter);
       }
-      const { count: totalLeads } = await leadsQuery;
+      const {
+        count: totalLeads
+      } = await leadsQuery;
 
       // Leads este mês
       const inicioMes = new Date();
       inicioMes.setDate(1);
       inicioMes.setHours(0, 0, 0, 0);
-
-      let leadsEsteMsQuery = supabase
-        .from("leads")
-        .select("*", { count: "exact", head: true })
-        .gte("data_criacao", inicioMes.toISOString());
+      let leadsEsteMsQuery = supabase.from("leads").select("*", {
+        count: "exact",
+        head: true
+      }).gte("data_criacao", inicioMes.toISOString());
       if (campanhaFilter) {
         leadsEsteMsQuery = leadsEsteMsQuery.eq("campanha_id", campanhaFilter);
       }
-      const { count: leadsEsteMs } = await leadsEsteMsQuery;
+      const {
+        count: leadsEsteMs
+      } = await leadsEsteMsQuery;
 
       // Leads mês anterior (para comparação)
       const inicioMesAnterior = new Date();
       inicioMesAnterior.setMonth(inicioMesAnterior.getMonth() - 1);
       inicioMesAnterior.setDate(1);
       inicioMesAnterior.setHours(0, 0, 0, 0);
-
       const fimMesAnterior = new Date(inicioMes);
       fimMesAnterior.setMilliseconds(-1);
-
-      let leadsEsteMsAnteriorQuery = supabase
-        .from("leads")
-        .select("*", { count: "exact", head: true })
-        .gte("data_criacao", inicioMesAnterior.toISOString())
-        .lte("data_criacao", fimMesAnterior.toISOString());
+      let leadsEsteMsAnteriorQuery = supabase.from("leads").select("*", {
+        count: "exact",
+        head: true
+      }).gte("data_criacao", inicioMesAnterior.toISOString()).lte("data_criacao", fimMesAnterior.toISOString());
       if (campanhaFilter) {
         leadsEsteMsAnteriorQuery = leadsEsteMsAnteriorQuery.eq("campanha_id", campanhaFilter);
       }
-      const { count: leadsEsteMesAnterior } = await leadsEsteMsAnteriorQuery;
+      const {
+        count: leadsEsteMesAnterior
+      } = await leadsEsteMsAnteriorQuery;
 
       // Total de campanhas ativas
-      const { count: totalCampanhas } = await supabase
-        .from("campanhas")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "ativa");
+      const {
+        count: totalCampanhas
+      } = await supabase.from("campanhas").select("*", {
+        count: "exact",
+        head: true
+      }).eq("status", "ativa");
 
       // Landing pages ativas
-      const { count: landingPagesAtivas } = await supabase
-        .from("campanhas")
-        .select("*", { count: "exact", head: true })
-        .not("tema_id", "is", null);
+      const {
+        count: landingPagesAtivas
+      } = await supabase.from("campanhas").select("*", {
+        count: "exact",
+        head: true
+      }).not("tema_id", "is", null);
 
       // Calcular taxa de conversão média
-      let metricasQuery = supabase
-        .from("metricas_campanha")
-        .select("total_leads, leads_convertidos");
+      let metricasQuery = supabase.from("metricas_campanha").select("total_leads, leads_convertidos");
       if (campanhaFilter) {
         metricasQuery = metricasQuery.eq("campanha_id", campanhaFilter);
       }
-      const { data: metricas } = await metricasQuery;
-
+      const {
+        data: metricas
+      } = await metricasQuery;
       let taxaConversaoMedia = 0;
       if (metricas && metricas.length > 0) {
         const totalLeadsMetricas = metricas.reduce((acc, curr) => acc + curr.total_leads, 0);
         const totalConvertidos = metricas.reduce((acc, curr) => acc + curr.leads_convertidos, 0);
-        taxaConversaoMedia = totalLeadsMetricas > 0 ? (totalConvertidos / totalLeadsMetricas) * 100 : 0;
+        taxaConversaoMedia = totalLeadsMetricas > 0 ? totalConvertidos / totalLeadsMetricas * 100 : 0;
       }
-
       setStats({
         totalLeads: totalLeads || 0,
         leadsEsteMs: leadsEsteMs || 0,
         leadsEsteMesAnterior: leadsEsteMesAnterior || 0,
         totalClientes: totalCampanhas || 0,
         landingPagesAtivas: landingPagesAtivas || 0,
-        taxaConversaoMedia,
+        taxaConversaoMedia
       });
     } catch (error: any) {
       console.error("Erro ao buscar estatísticas:", error);
     }
   };
-
-  return (
-    <Layout>
+  return <Layout>
       <div className="container mx-auto px-4 py-8 space-y-8">
         <div className="text-center mb-8">
           <div className="inline-block">
-            <h1 className="text-5xl font-bold mb-4 gradient-bg-hero bg-clip-text text-transparent">
-              Dashboard de Marketing
-            </h1>
+            
           </div>
           <p className="text-xl text-muted-foreground mb-4">
             Plataforma completa para gestão de leads e automação de vendas
@@ -160,73 +160,47 @@ const Dashboard = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="todas">Todas as Campanhas</SelectItem>
-                    {campanhas.map((campanha) => (
-                      <SelectItem key={campanha.id} value={campanha.id}>
+                    {campanhas.map(campanha => <SelectItem key={campanha.id} value={campanha.id}>
                         {campanha.nome}
-                      </SelectItem>
-                    ))}
+                      </SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
-              {selectedCampanha !== "todas" && (
-                <Badge variant="secondary">
+              {selectedCampanha !== "todas" && <Badge variant="secondary">
                   Filtro ativo
-                </Badge>
-              )}
+                </Badge>}
             </div>
           </CardContent>
         </Card>
         
         {/* Cards de Métricas com Design Aprimorado */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
-          <StatCard
-            title="Total de Leads"
-            value={stats.totalLeads}
-            description="Todos os leads capturados"
-            icon={<Users className="h-4 w-4" />}
-            trend={{ value: 12, label: "vs mês anterior" }}
-            className="shadow-brand-primary"
-          />
+          <StatCard title="Total de Leads" value={stats.totalLeads} description="Todos os leads capturados" icon={<Users className="h-4 w-4" />} trend={{
+          value: 12,
+          label: "vs mês anterior"
+        }} className="shadow-brand-primary" />
 
-          <StatCard
-            title="Campanhas Ativas"
-            value={stats.totalClientes}
-            description="Campanhas em execução"
-            icon={<Building className="h-4 w-4" />}
-            trend={{ value: 25, label: "crescimento" }}
-            className="shadow-brand-secondary"
-          />
+          <StatCard title="Campanhas Ativas" value={stats.totalClientes} description="Campanhas em execução" icon={<Building className="h-4 w-4" />} trend={{
+          value: 25,
+          label: "crescimento"
+        }} className="shadow-brand-secondary" />
 
-          <StatCard
-            title="Leads Este Mês"
-            value={stats.leadsEsteMs}
-            description={`Novos leads em ${new Date().toLocaleDateString('pt-BR', { month: 'long' })}`}
-            icon={<TrendingUp className="h-4 w-4" />}
-            trend={{ 
-              value: stats.leadsEsteMesAnterior > 0 
-                ? Math.round(((stats.leadsEsteMs - stats.leadsEsteMesAnterior) / stats.leadsEsteMesAnterior) * 100)
-                : 0, 
-              label: "vs mês anterior" 
-            }}
-            className="shadow-brand-accent"
-          />
+          <StatCard title="Leads Este Mês" value={stats.leadsEsteMs} description={`Novos leads em ${new Date().toLocaleDateString('pt-BR', {
+          month: 'long'
+        })}`} icon={<TrendingUp className="h-4 w-4" />} trend={{
+          value: stats.leadsEsteMesAnterior > 0 ? Math.round((stats.leadsEsteMs - stats.leadsEsteMesAnterior) / stats.leadsEsteMesAnterior * 100) : 0,
+          label: "vs mês anterior"
+        }} className="shadow-brand-accent" />
 
-          <StatCard
-            title="Landing Pages"
-            value={stats.landingPagesAtivas}
-            description="Páginas ativas"
-            icon={<Globe className="h-4 w-4" />}
-            trend={{ value: 5, label: "novas este mês" }}
-          />
+          <StatCard title="Landing Pages" value={stats.landingPagesAtivas} description="Páginas ativas" icon={<Globe className="h-4 w-4" />} trend={{
+          value: 5,
+          label: "novas este mês"
+        }} />
 
-          <StatCard
-            title="Conversão Média"
-            value={`${stats.taxaConversaoMedia.toFixed(1)}%`}
-            description="Taxa de sucesso"
-            icon={<BarChart3 className="h-4 w-4" />}
-            trend={{ value: 3, label: "melhoria" }}
-            className="shadow-glow"
-          />
+          <StatCard title="Conversão Média" value={`${stats.taxaConversaoMedia.toFixed(1)}%`} description="Taxa de sucesso" icon={<BarChart3 className="h-4 w-4" />} trend={{
+          value: 3,
+          label: "melhoria"
+        }} className="shadow-glow" />
         </div>
 
         {/* Grid de Ações e Atividades */}
@@ -252,48 +226,27 @@ const Dashboard = () => {
         </Card>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <Button 
-            size="lg" 
-            className="h-24 flex-col gap-2"
-            onClick={() => window.location.href = "/campanhas"}
-          >
+          <Button size="lg" className="h-24 flex-col gap-2" onClick={() => window.location.href = "/campanhas"}>
             <Building className="h-6 w-6" />
             Gerenciar Campanhas
           </Button>
           
-          <Button 
-            size="lg" 
-            variant="outline"
-            className="h-24 flex-col gap-2"
-            onClick={() => window.location.href = "/leads"}
-          >
+          <Button size="lg" variant="outline" className="h-24 flex-col gap-2" onClick={() => window.location.href = "/leads"}>
             <Users className="h-6 w-6" />
             Ver Todos os Leads
           </Button>
           
-          <Button 
-            size="lg" 
-            variant="outline"
-            className="h-24 flex-col gap-2"
-            onClick={() => window.location.href = "/captura"}
-          >
+          <Button size="lg" variant="outline" className="h-24 flex-col gap-2" onClick={() => window.location.href = "/captura"}>
             <Share2 className="h-6 w-6" />
             Criar Landing Page
           </Button>
           
-          <Button 
-            size="lg" 
-            variant="outline"
-            className="h-24 flex-col gap-2"
-            onClick={() => window.open("https://docs.lovable.dev", "_blank")}
-          >
+          <Button size="lg" variant="outline" className="h-24 flex-col gap-2" onClick={() => window.open("https://docs.lovable.dev", "_blank")}>
             <BookOpen className="h-6 w-6" />
             Documentação
           </Button>
         </div>
       </div>
-    </Layout>
-  );
+    </Layout>;
 };
-
 export default Dashboard;
